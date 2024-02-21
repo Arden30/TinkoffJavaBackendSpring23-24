@@ -23,9 +23,10 @@ public class TrackCommand implements Command {
     @Override
     public SendMessage handle(Update update) {
         Long id = update.message().chat().id();
-        if (!userService.changeState(id, State.ADD_LINK)) {
+        if (userService.findById(id).isEmpty()) {
             return new SendMessage(id, "Please, register (input command /start)");
         }
+        userService.changeState(id, State.ADD_LINK);
 
         return new SendMessage(id, "Input your link to track (github/stackoverflow)");
     }

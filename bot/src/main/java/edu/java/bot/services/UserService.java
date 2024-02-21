@@ -42,18 +42,14 @@ public class UserService {
         return users.containsKey(id) ? Optional.of(users.get(id)) : Optional.empty();
     }
 
-    public boolean changeState(long id, State state) {
+    public void changeState(long id, State state) {
         Optional<User> userOptional = findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             deleteUser(user);
             user.setState(state);
             addUser(user);
-
-            return true;
         }
-
-        return false;
     }
 
 }

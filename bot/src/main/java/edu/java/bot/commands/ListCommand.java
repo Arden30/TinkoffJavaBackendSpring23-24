@@ -28,19 +28,23 @@ public class ListCommand implements Command {
         Long id = update.message().chat().id();
         Optional<User> userOptional = userService.findById(id);
 
-        if (userOptional.isPresent()) {
-            StringBuilder response = new StringBuilder();
-            List<URI> uriList = userOptional.get().getLinks();
-            if (uriList.isEmpty()) {
-                return new SendMessage(id, "List is empty");
-            }
-
-            response.append("Your links: \n");
-            uriList.forEach(uri -> response.append(uri.toString()).append("\n"));
-
-            return new SendMessage(id, response.toString());
+        if (userOptional.isEmpty()) {
+            return new SendMessage(id, "Please, register (input command /start)");
         }
 
-        return new SendMessage(id, "Please, register (input command /start)");
+        return new SendMessage(id, createResponse(userOptional.get().getLinks()));
+    }
+
+    private String createResponse(List<URI> uriList) {
+        StringBuilder response = new StringBuilder();
+
+        if (uriList.isEmpty()) {
+            return "List is empty";
+        }
+
+        response.append("Your links: \n");
+        uriList.forEach(uri -> response.append(uri.toString()).append("\n"));
+
+        return response.toString();
     }
 }

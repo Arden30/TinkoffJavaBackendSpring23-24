@@ -7,17 +7,23 @@ import edu.java.bot.commands.StartCommand;
 import edu.java.bot.commands.TrackCommand;
 import edu.java.bot.commands.UntrackCommand;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Getter
-@RequiredArgsConstructor
 public class CommandsService {
     private final UserService userService;
     private final Map<String, Command> commands = new HashMap<>();
+
+    @Autowired
+    public CommandsService(UserService userService, List<Command> commands) {
+        this.userService = userService;
+        commands.forEach(command -> this.commands.put(command.command(), command));
+    }
 
     public void setAllCommands() {
         Command help = new HelpCommand(this);
