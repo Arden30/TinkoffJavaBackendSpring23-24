@@ -1,7 +1,9 @@
 package edu.java.configuration;
 
 import edu.java.clients.bot.BotWebClient;
+import edu.java.clients.github.GitHubClient;
 import edu.java.clients.github.GitHubClientImpl;
+import edu.java.clients.stackoverflow.StackOverFlowClient;
 import edu.java.clients.stackoverflow.StackOverFlowClientImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +22,12 @@ public class ClientConfiguration {
     }
 
     @Bean
-    public GitHubClientImpl gitHubClient() {
+    public GitHubClient gitHubClient() {
         return new GitHubClientImpl(gitHubConfig);
     }
 
     @Bean
-    public StackOverFlowClientImpl stackOverFlowClient() {
+    public StackOverFlowClient stackOverFlowClient() {
         return new StackOverFlowClientImpl(stackOverflowConfig);
     }
 }
