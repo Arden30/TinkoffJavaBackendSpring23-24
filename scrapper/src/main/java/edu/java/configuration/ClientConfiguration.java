@@ -29,5 +29,6 @@ public class ClientConfiguration {
     @Bean
     public StackOverFlowClient stackOverFlowClient() {
         return new StackOverFlowClientImpl(stackOverflowConfig);
+
     }
 }
