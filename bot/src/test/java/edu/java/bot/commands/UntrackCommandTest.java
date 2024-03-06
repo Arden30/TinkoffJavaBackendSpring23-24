@@ -1,10 +1,12 @@
-package edu.java.bot;
+package edu.java.bot.commands;
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.BotApplication;
 import edu.java.bot.services.CommandsService;
+import edu.java.bot.services.MessageService;
 import edu.java.bot.services.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,14 +19,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {BotApplication.class})
-public class StartCommandTest {
+public class UntrackCommandTest {
     CommandsService commandsService;
-
+    MessageService messageService;
     UserService userService;
 
     @Autowired
-    StartCommandTest(UserService userService, CommandsService commandsService) {
+    UntrackCommandTest(CommandsService commandsService, MessageService messageService, UserService userService) {
         this.commandsService = commandsService;
+        this.messageService = messageService;
         this.userService = userService;
     }
     @Mock
@@ -35,6 +38,8 @@ public class StartCommandTest {
 
     @Mock
     Chat chat;
+
+    String link = "https://github.com/sanyarnd/java-course-2023-backend-template";
 
     @BeforeEach
     void setMock() {
@@ -50,14 +55,17 @@ public class StartCommandTest {
     }
 
     @Test
-    @DisplayName("Command start test")
-    void testStart() {
-        String expected = "You were successfully registered!";
-        SendMessage sendMessage = commandsService.getCommands().get("/start").handle(update);
-        assertThat(sendMessage.toWebhookResponse()).contains(expected);
+    @DisplayName("Command untrack test")
+    void testUntrack() {
+        userService.register(update.message().chat().id());
+        messageService.addLink(update.message().chat().id(), link);
 
-        String expected2 = "You are already registered";
-        SendMessage sendMessage2 = commandsService.getCommands().get("/start").handle(update);
-        assertThat(sendMessage2.toWebhookResponse()).contains(expected2);
+        String expectedInput = "Input your link to untrack";
+        SendMessage sendMessage = commandsService.getCommands().get("/untrack").handle(update);
+        assertThat(sendMessage.toWebhookResponse()).contains(expectedInput);
+
+        String expectedLink = "Link was deleted:\\n" + link;
+        SendMessage linkResponse = messageService.deleteLink(update.message().chat().id(), link);
+        assertThat(linkResponse.toWebhookResponse()).contains(expectedLink);
     }
 }

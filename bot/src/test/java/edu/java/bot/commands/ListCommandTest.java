@@ -1,9 +1,10 @@
-package edu.java.bot;
+package edu.java.bot.commands;
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.BotApplication;
 import edu.java.bot.services.CommandsService;
 import edu.java.bot.services.MessageService;
 import edu.java.bot.services.UserService;

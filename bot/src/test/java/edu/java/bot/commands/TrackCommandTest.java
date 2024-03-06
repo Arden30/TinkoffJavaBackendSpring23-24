@@ -1,9 +1,10 @@
-package edu.java.bot;
+package edu.java.bot.commands;
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.BotApplication;
 import edu.java.bot.services.CommandsService;
 import edu.java.bot.services.MessageService;
 import edu.java.bot.services.UserService;
@@ -18,13 +19,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {BotApplication.class})
-public class UntrackCommandTest {
+public class TrackCommandTest {
     CommandsService commandsService;
     MessageService messageService;
     UserService userService;
 
     @Autowired
-    UntrackCommandTest(CommandsService commandsService, MessageService messageService, UserService userService) {
+    TrackCommandTest(CommandsService commandsService, MessageService messageService, UserService userService) {
         this.commandsService = commandsService;
         this.messageService = messageService;
         this.userService = userService;
@@ -54,17 +55,16 @@ public class UntrackCommandTest {
     }
 
     @Test
-    @DisplayName("Command untrack test")
-    void testUntrack() {
+    @DisplayName("Command track test")
+    void testTrack() {
         userService.register(update.message().chat().id());
-        messageService.addLink(update.message().chat().id(), link);
 
-        String expectedInput = "Input your link to untrack";
-        SendMessage sendMessage = commandsService.getCommands().get("/untrack").handle(update);
+        String expectedInput = "Input your link to track (github/stackoverflow)";
+        SendMessage sendMessage = commandsService.getCommands().get("/track").handle(update);
         assertThat(sendMessage.toWebhookResponse()).contains(expectedInput);
 
-        String expectedLink = "Link was deleted:\\n" + link;
-        SendMessage linkResponse = messageService.deleteLink(update.message().chat().id(), link);
+        String expectedLink = "Now your link is being tracked:\\n" + link;
+        SendMessage linkResponse = messageService.addLink(update.message().chat().id(), link);
         assertThat(linkResponse.toWebhookResponse()).contains(expectedLink);
     }
 }

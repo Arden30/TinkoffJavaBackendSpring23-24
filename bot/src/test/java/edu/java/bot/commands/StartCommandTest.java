@@ -1,11 +1,11 @@
-package edu.java.bot;
+package edu.java.bot.commands;
 
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.BotApplication;
 import edu.java.bot.services.CommandsService;
-import edu.java.bot.services.MessageService;
 import edu.java.bot.services.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,15 +18,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {BotApplication.class})
-public class TrackCommandTest {
+public class StartCommandTest {
     CommandsService commandsService;
-    MessageService messageService;
+
     UserService userService;
 
     @Autowired
-    TrackCommandTest(CommandsService commandsService, MessageService messageService, UserService userService) {
+    StartCommandTest(UserService userService, CommandsService commandsService) {
         this.commandsService = commandsService;
-        this.messageService = messageService;
         this.userService = userService;
     }
     @Mock
@@ -37,8 +36,6 @@ public class TrackCommandTest {
 
     @Mock
     Chat chat;
-
-    String link = "https://github.com/sanyarnd/java-course-2023-backend-template";
 
     @BeforeEach
     void setMock() {
@@ -54,16 +51,14 @@ public class TrackCommandTest {
     }
 
     @Test
-    @DisplayName("Command track test")
-    void testTrack() {
-        userService.register(update.message().chat().id());
+    @DisplayName("Command start test")
+    void testStart() {
+        String expected = "You were successfully registered!";
+        SendMessage sendMessage = commandsService.getCommands().get("/start").handle(update);
+        assertThat(sendMessage.toWebhookResponse()).contains(expected);
 
-        String expectedInput = "Input your link to track (github/stackoverflow)";
-        SendMessage sendMessage = commandsService.getCommands().get("/track").handle(update);
-        assertThat(sendMessage.toWebhookResponse()).contains(expectedInput);
-
-        String expectedLink = "Now your link is being tracked:\\n" + link;
-        SendMessage linkResponse = messageService.addLink(update.message().chat().id(), link);
-        assertThat(linkResponse.toWebhookResponse()).contains(expectedLink);
+        String expected2 = "You are already registered";
+        SendMessage sendMessage2 = commandsService.getCommands().get("/start").handle(update);
+        assertThat(sendMessage2.toWebhookResponse()).contains(expected2);
     }
 }
