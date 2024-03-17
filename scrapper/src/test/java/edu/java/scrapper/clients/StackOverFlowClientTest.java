@@ -3,6 +3,7 @@ package edu.java.scrapper.clients;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.clients.stackoverflow.StackOverFlowClient;
 import edu.java.clients.stackoverflow.StackOverFlowClientImpl;
+import edu.java.clients.stackoverflow.dto.StackOverFlowQuestion;
 import edu.java.clients.stackoverflow.dto.StackOverFlowResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,10 +26,10 @@ public class StackOverFlowClientTest {
             )));
 
         StackOverFlowClient stackOverFlowClient = new StackOverFlowClientImpl(baseUrl);
-        StackOverFlowResponse stackOverFlowResponse = stackOverFlowClient.fetchUser(id);
+        StackOverFlowQuestion stackOverFlowResponse = stackOverFlowClient.fetchUser(id).get();
 
-        assertThat(stackOverFlowResponse.getStackOverFlowQuestions().get(0).getStackOverFlowOwner().getDisplayName()).isEqualTo(name);
-        assertThat(stackOverFlowResponse.getStackOverFlowQuestions().get(0).getId()).isEqualTo(id);
+        assertThat(stackOverFlowResponse.getStackOverFlowOwner().getDisplayName()).isEqualTo(name);
+        assertThat(stackOverFlowResponse.getId()).isEqualTo(id);
     }
 
     String getResponseBody(long id, String name) {
@@ -44,7 +45,7 @@ public class StackOverFlowClientTest {
                                "is_answered": true,
                                "answer_count": 3,
                                "body": "test question body",
-                               "creation_date": "2023-09-13T21:17:36Z"
+                               "last_activity_date": "2023-09-13T21:17:36Z"
                            }
                    ],
                "has_more": false,

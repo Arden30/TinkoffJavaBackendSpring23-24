@@ -1,7 +1,9 @@
 package edu.java.clients.stackoverflow;
 
+import edu.java.clients.stackoverflow.dto.StackOverFlowQuestion;
 import edu.java.clients.stackoverflow.dto.StackOverFlowResponse;
 import edu.java.configuration.StackOverFlowConfig;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,11 +32,13 @@ public class StackOverFlowClientImpl implements StackOverFlowClient {
     }
 
     @Override
-    public StackOverFlowResponse fetchUser(long id) {
+    public Optional<StackOverFlowQuestion> fetchUser(long id) {
         return webClient.get()
             .uri("/questions/{id}", id)
             .retrieve()
             .bodyToMono(StackOverFlowResponse.class)
-            .block();
+            .filter(questions -> !questions.getStackOverFlowQuestions().isEmpty())
+            .map(questions -> questions.getStackOverFlowQuestions().get(0))
+            .blockOptional();
     }
 }

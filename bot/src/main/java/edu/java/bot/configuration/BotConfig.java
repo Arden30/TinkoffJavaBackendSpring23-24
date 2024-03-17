@@ -15,13 +15,11 @@ import org.springframework.context.annotation.Configuration;
 public class BotConfig {
     private final ApplicationConfig applicationConfig;
     private final CommandsService commandsService;
-    private Map<String, Command> commands;
 
     @Bean
     public Map<String, Command> commands() {
         commandsService.setAllCommands();
-        commands = commandsService.getCommands();
-        return commands;
+        return commandsService.getCommands();
     }
 
     @Bean
@@ -32,6 +30,8 @@ public class BotConfig {
     }
 
     private SetMyCommands createCommandMenu() {
+        Map<String, Command> commands = commandsService.getCommands();
+
         return new SetMyCommands(commands.values().stream().map(command -> new BotCommand(command
                 .command(), command.description()))
             .toArray(BotCommand[]::new));

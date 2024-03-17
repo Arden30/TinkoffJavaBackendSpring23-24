@@ -1,7 +1,8 @@
 package edu.java.clients.stackoverflow;
 
-import edu.java.clients.stackoverflow.dto.StackOverFlowResponse;
+import edu.java.clients.stackoverflow.dto.StackOverFlowQuestion;
+import java.util.Optional;
 
 public interface StackOverFlowClient {
-    StackOverFlowResponse fetchUser(long id);
+    Optional<StackOverFlowQuestion> fetchUser(long id);
 }

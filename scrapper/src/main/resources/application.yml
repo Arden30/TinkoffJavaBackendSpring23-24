@@ -13,6 +13,13 @@ stackoverflow-client:
 spring:
   application:
     name: scrapper
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5555/scrapper
+    password: postgres
+    username: postgres
+  liquibase:
+    enabled: false
 
 bot-client:
   base-url: https://localhost:8080

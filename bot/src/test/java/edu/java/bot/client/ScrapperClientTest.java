@@ -11,8 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import java.net.URI;
-import java.net.URISyntaxException;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -76,14 +74,14 @@ public class ScrapperClientTest {
     @Test
     @DisplayName("Successful registration")
     public void registerChat(){
-        String responseBody = "Chat with id 1 was successfully registered!";
+        boolean responseBody = true;
         stubFor(post("/tg-chat/1")
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .withBody(responseBody)));
+                .withBody(String.valueOf(responseBody))));
 
-        String actualResponse = scrapperWebClient.registerChat(1L);
+        boolean actualResponse = scrapperWebClient.registerChat(1L);
 
         assertThat(actualResponse).isEqualTo(responseBody);
     }
@@ -106,26 +104,22 @@ public class ScrapperClientTest {
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .withBody(INVALID_BODY)));
 
-        Throwable actualException = catchThrowableOfType(
-            () -> scrapperWebClient.registerChat(1L),
-            ApiErrorException.class
-        );
 
-        assertThat(actualException)
-            .isInstanceOf(ApiErrorException.class);
+        assertThat(scrapperWebClient.registerChat(1L))
+            .isFalse();
     }
 
     @Test
     @DisplayName("Successful deleting of chat")
     public void deleteChat() {
-        String responseBody = "Chat with id 1 was successfully deleted!";
+        boolean responseBody = true;
         stubFor(delete("/tg-chat/1")
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .withBody(responseBody)));
+                .withBody(String.valueOf(responseBody))));
 
-        String actualResponse = scrapperWebClient.deleteChat(1L);
+        boolean actualResponse = scrapperWebClient.deleteChat(1L);
 
         assertThat(actualResponse).isEqualTo(responseBody);
     }
@@ -139,13 +133,8 @@ public class ScrapperClientTest {
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .withBody(NOT_FOUND_BODY)));
 
-        Throwable actualException = catchThrowableOfType(
-            () -> scrapperWebClient.deleteChat(1L),
-            ApiErrorException.class
-        );
-
-        assertThat(actualException)
-            .isInstanceOf(ApiErrorException.class);
+        assertThat(scrapperWebClient.deleteChat(1L))
+            .isFalse();
     }
 
     @Test
@@ -158,7 +147,7 @@ public class ScrapperClientTest {
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .withBody(LIST_OF_LINKS)));
 
-        ListLinksResponse actualResponse = scrapperWebClient.getLinks(1L);
+        ListLinksResponse actualResponse = scrapperWebClient.getLinks(1L).get();
 
         assertThat(actualResponse.list().size()).isEqualTo(1);
     }
@@ -184,7 +173,7 @@ public class ScrapperClientTest {
 
     @Test
     @DisplayName("Successful adding of link")
-    public void addLink() throws URISyntaxException {
+    public void addLink() {
         stubFor(post("/links")
             .withHeader("Tg-Chat-Id", equalTo("1"))
             .willReturn(aResponse()
@@ -193,8 +182,8 @@ public class ScrapperClientTest {
                 .withBody(LINK)));
 
         LinkResponse actualResponse = scrapperWebClient.addLink(
-            1L, new AddLinkRequest(new URI("link"))
-        );
+            1L, new AddLinkRequest("link")
+        ).get();
 
         assertThat(actualResponse.url().getPath()).isEqualTo("link");
     }
@@ -210,7 +199,7 @@ public class ScrapperClientTest {
                 .withBody(NOT_FOUND_BODY)));
 
         Throwable actualException = catchThrowableOfType(
-            () -> scrapperWebClient.addLink(1L, new AddLinkRequest(new URI("123"))),
+            () -> scrapperWebClient.addLink(1L, new AddLinkRequest("123")),
             ApiErrorException.class
         );
 
@@ -220,7 +209,7 @@ public class ScrapperClientTest {
 
     @Test
     @DisplayName("Successful remove of link")
-    public void removeLink() throws URISyntaxException {
+    public void removeLink() {
         stubFor(delete("/links")
             .withHeader("Tg-Chat-Id", equalTo("1"))
             .willReturn(aResponse()
@@ -229,8 +218,8 @@ public class ScrapperClientTest {
                 .withBody(LINK)));
 
         LinkResponse actualResponse = scrapperWebClient.removeLink(
-            1L, new RemoveLinkRequest(new URI("link"))
-        );
+            1L, new RemoveLinkRequest("link")
+        ).get();
 
         assertThat(actualResponse.url().getPath()).isEqualTo("link");
     }
@@ -246,7 +235,7 @@ public class ScrapperClientTest {
                 .withBody(NOT_FOUND_BODY)));
 
         Throwable actualException = catchThrowableOfType(
-            () -> scrapperWebClient.removeLink(1L, new RemoveLinkRequest(new URI("link"))),
+            () -> scrapperWebClient.removeLink(1L, new RemoveLinkRequest("link")),
             ApiErrorException.class
         );
 

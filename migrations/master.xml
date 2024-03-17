@@ -7,7 +7,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <include file="chat.sql" relativeToChangelogFile="true"/>
-    <include file="link.sql" relativeToChangelogFile="true"/>
-    <include file="link_to_chat.sql" relativeToChangelogFile="true"/>
+    <changeSet id="1-schema.sql" author="Denis Arsenev">
+        <sqlFile path="schema.sql"/>
+    </changeSet>
 </databaseChangeLog>

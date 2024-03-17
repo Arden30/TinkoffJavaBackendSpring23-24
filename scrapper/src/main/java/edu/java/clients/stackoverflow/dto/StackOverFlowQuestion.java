@@ -8,8 +8,8 @@ import lombok.Data;
 public class StackOverFlowQuestion {
     @JsonProperty("owner")
     StackOverFlowOwner stackOverFlowOwner;
-    @JsonProperty("creation_date")
-    OffsetDateTime creationDate;
+    @JsonProperty("last_activity_date")
+    OffsetDateTime updatedAt;
     @JsonProperty("id")
     Long id;
 }
