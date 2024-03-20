@@ -33,14 +33,14 @@ public class LinkUpdaterImpl implements LinkUpdater {
     private final BotWebClient botWebClient;
     private final GitHubClient gitHubClient;
     private final StackOverFlowClient stackOverFlowClient;
-    @Value("${app.scheduler.interval}")
-    private final Duration interval;
+    @Value("${app.scheduler.update}")
+    private final Duration update;
     private final LinkParser parser = LinkParser.createChain(new GitHubParser(), new StackOverFlowParser());
 
     @Override
     @Transactional
     public void update() {
-        List<Link> updatedLinks = linkRepository.recentlyUpdated(OffsetDateTime.now().minus(interval));
+        List<Link> updatedLinks = linkRepository.recentlyUpdated(OffsetDateTime.now().minus(update));
         List<Link> linksForNotify = new ArrayList<>();
         for (Link link : updatedLinks) {
             var parserResponse = parseUrl(link.getUrl());

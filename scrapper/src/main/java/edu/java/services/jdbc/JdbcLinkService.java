@@ -37,6 +37,10 @@ public class JdbcLinkService implements LinkService {
         Link link = jdbcLinkRepository.findByUrl(url).orElseThrow(() -> new NoSuchLinkException("Link was not found"));
         jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId());
 
+        if (!jdbcLinkRepository.findLinkInAllChats(link.getId())) {
+            jdbcLinkRepository.removeLink(link.getId());
+        }
+
         return link;
     }
 

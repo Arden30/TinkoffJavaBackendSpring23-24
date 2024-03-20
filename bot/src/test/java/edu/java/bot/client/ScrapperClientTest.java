@@ -1,7 +1,6 @@
 package edu.java.bot.client;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import edu.java.bot.client.dto.exceptions.ApiErrorException;
 import edu.java.bot.client.dto.request.AddLinkRequest;
 import edu.java.bot.client.dto.request.RemoveLinkRequest;
 import edu.java.bot.client.dto.response.LinkResponse;
@@ -18,7 +17,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.catchThrowableOfType;
 
 @WireMockTest(httpPort = 8090)
 public class ScrapperClientTest {
@@ -162,13 +160,9 @@ public class ScrapperClientTest {
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .withBody(NOT_FOUND_BODY)));
 
-        Throwable actualException = catchThrowableOfType(
-            () -> scrapperWebClient.getLinks(1L),
-            ApiErrorException.class
-        );
+        var response = scrapperWebClient.getLinks(1L);
 
-        assertThat(actualException)
-            .isInstanceOf(ApiErrorException.class);
+        assertThat(response).isEmpty();
     }
 
     @Test
@@ -198,13 +192,9 @@ public class ScrapperClientTest {
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .withBody(NOT_FOUND_BODY)));
 
-        Throwable actualException = catchThrowableOfType(
-            () -> scrapperWebClient.addLink(1L, new AddLinkRequest("123")),
-            ApiErrorException.class
-        );
+        var response = scrapperWebClient.addLink(1L, new AddLinkRequest("123"));
 
-        assertThat(actualException)
-            .isInstanceOf(ApiErrorException.class);
+        assertThat(response).isEmpty();
     }
 
     @Test
@@ -234,12 +224,8 @@ public class ScrapperClientTest {
                 .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .withBody(NOT_FOUND_BODY)));
 
-        Throwable actualException = catchThrowableOfType(
-            () -> scrapperWebClient.removeLink(1L, new RemoveLinkRequest("link")),
-            ApiErrorException.class
-        );
+        var response = scrapperWebClient.removeLink(1L, new RemoveLinkRequest("link"));
 
-        assertThat(actualException)
-            .isInstanceOf(ApiErrorException.class);
+        assertThat(response).isEmpty();
     }
 }

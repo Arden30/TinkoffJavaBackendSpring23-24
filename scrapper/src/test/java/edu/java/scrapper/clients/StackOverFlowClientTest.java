@@ -4,7 +4,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.clients.stackoverflow.StackOverFlowClient;
 import edu.java.clients.stackoverflow.StackOverFlowClientImpl;
 import edu.java.clients.stackoverflow.dto.StackOverFlowQuestion;
-import edu.java.clients.stackoverflow.dto.StackOverFlowResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -20,7 +19,7 @@ public class StackOverFlowClientTest {
     @Test
     @DisplayName("StackOverFlow client test")
     void test() {
-        stubFor(get("/questions/" + id)
+        stubFor(get("/questions/" + id + "/site=stackoverflow")
             .willReturn(okJson(
                 getResponseBody(id, name)
             )));

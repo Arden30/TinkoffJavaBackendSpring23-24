@@ -3,6 +3,7 @@ package edu.java.bot.commands;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.client.dto.response.LinkResponse;
+import edu.java.bot.model.State;
 import edu.java.bot.services.LinkService;
 import java.net.URI;
 import java.util.List;
@@ -24,6 +25,11 @@ public class ListCommand implements Command {
     }
 
     @Override
+    public State state() {
+        return State.DEFAULT;
+    }
+
+    @Override
     public SendMessage handle(Update update) {
         Long id = update.message().chat().id();
 
@@ -33,13 +39,18 @@ public class ListCommand implements Command {
             return new SendMessage(id, "There are no tracked links");
         }
 
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Your links: \n");
+
         String links = linkResponses
             .stream()
             .map(LinkResponse::url)
             .map(URI::toString)
             .collect(Collectors.joining("\n"));
 
-        return new SendMessage(id, links);
+        stringBuilder.append(links);
+
+        return new SendMessage(id, stringBuilder.toString());
     }
 
 }

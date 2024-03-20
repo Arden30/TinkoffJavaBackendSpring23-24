@@ -1,7 +1,5 @@
 package edu.java.bot.client;
 
-import edu.java.bot.api.dto.response.ApiErrorResponse;
-import edu.java.bot.client.dto.exceptions.ApiErrorException;
 import edu.java.bot.client.dto.request.AddLinkRequest;
 import edu.java.bot.client.dto.request.RemoveLinkRequest;
 import edu.java.bot.client.dto.response.LinkResponse;
@@ -9,7 +7,6 @@ import edu.java.bot.client.dto.response.ListLinksResponse;
 import edu.java.bot.configuration.ScrapperConfig;
 import java.util.Optional;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -60,13 +57,8 @@ public class ScrapperWebClient {
             .accept(MediaType.APPLICATION_JSON)
             .header(HEADER_NAME, String.valueOf(id))
             .retrieve()
-            .onStatus(
-                HttpStatusCode::is4xxClientError,
-                response -> response
-                    .bodyToMono(ApiErrorResponse.class)
-                    .flatMap(errorResponse -> Mono.error(new ApiErrorException(errorResponse)))
-            )
             .bodyToMono(ListLinksResponse.class)
+            .onErrorResume(exception -> Mono.empty())
             .blockOptional();
     }
 
@@ -78,13 +70,8 @@ public class ScrapperWebClient {
             .header(HEADER_NAME, String.valueOf(id))
             .body(BodyInserters.fromValue(request))
             .retrieve()
-            .onStatus(
-                HttpStatusCode::is4xxClientError,
-                response -> response
-                    .bodyToMono(ApiErrorResponse.class)
-                    .flatMap(errorResponse -> Mono.error(new ApiErrorException(errorResponse)))
-            )
             .bodyToMono(LinkResponse.class)
+            .onErrorResume(exception -> Mono.empty())
             .blockOptional();
     }
 
@@ -95,13 +82,8 @@ public class ScrapperWebClient {
             .header(HEADER_NAME, String.valueOf(id))
             .body(BodyInserters.fromValue(request))
             .retrieve()
-            .onStatus(
-                HttpStatusCode::is4xxClientError,
-                response -> response
-                    .bodyToMono(ApiErrorResponse.class)
-                    .flatMap(errorResponse -> Mono.error(new ApiErrorException(errorResponse)))
-            )
             .bodyToMono(LinkResponse.class)
+            .onErrorResume(exception -> Mono.empty())
             .blockOptional();
     }
 }

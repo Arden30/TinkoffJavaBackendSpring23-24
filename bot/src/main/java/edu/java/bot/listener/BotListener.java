@@ -7,9 +7,11 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.client.dto.request.AddLinkRequest;
 import edu.java.bot.client.dto.request.RemoveLinkRequest;
 import edu.java.bot.commands.Command;
+import edu.java.bot.links.LinkValidator;
 import edu.java.bot.model.State;
-import edu.java.bot.model.UserRequest;
 import edu.java.bot.services.LinkService;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,42 +22,59 @@ public class BotListener implements UpdatesListener, AutoCloseable {
     private final Map<String, Command> commands;
     private final TelegramBot telegramBot;
     private final LinkService linkService;
+    private final Map<Long, State> states = new HashMap<>();
+    private final LinkValidator linkValidator;
 
     @Autowired
     public BotListener(
         Map<String, Command> commands,
         TelegramBot telegramBot,
-        LinkService linkService
+        LinkService linkService,
+        LinkValidator linkValidator
     ) {
         this.commands = commands;
         this.telegramBot = telegramBot;
         this.linkService = linkService;
+        this.linkValidator = linkValidator;
         telegramBot.setUpdatesListener(this);
     }
 
     @Override
     public int process(List<Update> list) {
         for (Update update : list) {
-            State state;
-            if (update.message().text().startsWith("/track")) {
-                state = State.ADD_LINK;
-                telegramBot.execute(handle(update, state).request());
-            } else if (update.message().text().startsWith("/untrack")) {
-                state = State.DELETE_LINK;
-                telegramBot.execute(handle(update, state).request());
-            } else {
-                if (commands.containsKey(update.message().text())) {
-                    telegramBot.execute(commands.get(update.message().text()).handle(update));
-                } else {
-                    telegramBot.execute(new SendMessage(update.message().chat().id(), "No such command"));
+            Long id = update.message().chat().id();
+            String message = update.message().text();
+
+            State state = states.getOrDefault(id, State.DEFAULT);
+
+            if (!state.equals(State.DEFAULT)) {
+                if (!linkValidator.isValid(URI.create(message))) {
+                    telegramBot.execute(new SendMessage(
+                        id,
+                        "Link must be on GitHub repository or StackOverflow question!"
+                    ));
+                    states.put(id, State.DEFAULT);
+                    continue;
                 }
+
+                telegramBot.execute(handle(update, state));
+                continue;
             }
+
+            if (commands.containsKey(message)) {
+                State newState = commands.containsKey(message) ? commands.get(message).state() : State.DEFAULT;
+                states.put(id, newState);
+                telegramBot.execute(commands.get(message).handle(update));
+            } else {
+                telegramBot.execute(new SendMessage(id, "No such command!"));
+            }
+
         }
 
         return com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
 
-    private UserRequest handle(Update update, State state) {
+    private SendMessage handle(Update update, State state) {
         String message;
 
         switch (state) {
@@ -63,7 +82,8 @@ public class BotListener implements UpdatesListener, AutoCloseable {
                 var response =
                     linkService.addLink(update.message().chat().id(), new AddLinkRequest(update.message().text()));
                 message = response.isPresent() ? "This link " + update.message().text() + " is being tracked now!"
-                    : "Can't track this link";
+                    : "Can't track this link (only github repositories and stackoverflow questions are available)";
+                states.put(update.message().chat().id(), State.DEFAULT);
             }
             case DELETE_LINK -> {
                 var response = linkService.deleteLink(
@@ -71,14 +91,13 @@ public class BotListener implements UpdatesListener, AutoCloseable {
                     new RemoveLinkRequest(update.message().text())
                 );
                 message = response.isPresent() ? "Link " + update.message().text() + " is being untracked now!"
-                    : "Can't untrack this link";
+                    : "Can't untrack this link, because it's not being tracked";
+                states.put(update.message().chat().id(), State.DEFAULT);
             }
-            default -> message = "No command";
+            default -> message = "Something went wrong";
         }
 
-        return UserRequest.builder()
-            .request(new SendMessage(update, message))
-            .build();
+        return new SendMessage(update.message().chat().id(), message);
     }
 
     @Override

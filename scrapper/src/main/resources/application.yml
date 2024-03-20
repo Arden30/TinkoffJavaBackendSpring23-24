@@ -2,6 +2,7 @@ app:
   scheduler:
     enable: true
     interval: 10000
+    update: 90000
     force-check-delay: 10000
 
 github-client:
@@ -22,7 +23,7 @@ spring:
     enabled: false
 
 bot-client:
-  base-url: https://localhost:8080
+  base-url: http://localhost:8090/bot/api/v1/
 
 server:
   port: 8080

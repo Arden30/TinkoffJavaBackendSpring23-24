@@ -53,18 +53,22 @@ public class ScrapperController {
     }
 
     @PostMapping("/links")
-    public ResponseEntity<?> addLinks(
+    public ResponseEntity<LinkResponse> addLinks(
         @RequestHeader("Tg-Chat-Id") long id,
         @RequestBody @Valid AddLinkRequest request
     ) {
-        return ResponseEntity.ok(linkService.add(id, request.link().toString()));
+        linkService.add(id, request.link().toString());
+
+        return ResponseEntity.ok(new LinkResponse(id, request.link()));
     }
 
     @DeleteMapping("/links")
-    public ResponseEntity<?> deleteLink(
+    public ResponseEntity<LinkResponse> deleteLink(
         @RequestHeader("Tg-Chat-Id") long id,
         @RequestBody @Valid RemoveLinkRequest request
     ) {
-        return ResponseEntity.ok(linkService.remove(id, request.link().toString()));
+        linkService.remove(id, request.link().toString());
+
+        return ResponseEntity.ok(new LinkResponse(id, request.link()));
     }
 }

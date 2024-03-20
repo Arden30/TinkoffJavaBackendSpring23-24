@@ -2,6 +2,7 @@ package edu.java.bot.commands;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.model.State;
 import edu.java.bot.services.CommandsService;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +18,11 @@ public class HelpCommand implements Command {
     @Override
     public String description() {
         return "list of available commands for bot";
+    }
+
+    @Override
+    public State state() {
+        return State.DEFAULT;
     }
 
     @Override

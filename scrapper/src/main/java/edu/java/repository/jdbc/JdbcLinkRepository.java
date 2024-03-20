@@ -23,6 +23,11 @@ public class JdbcLinkRepository implements LinkRepository {
 
     private final static String FIND_BY_ID = "SELECT * FROM link WHERE id = ?";
     private final static String FIND_BY_URL = "SELECT * FROM link WHERE url = ?";
+    private final static String FIND_CHATS_BY_LINK = """
+        SELECT chat.* FROM chat
+        JOIN link_to_chat ON chat.id = chat_id
+        WHERE link_id = ?
+        """;
     private final static String ADD_LINK = "INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)";
     private final static String ADD_TO_CHAT = "INSERT INTO link_to_chat VALUES(?, ?)";
     private final static String DELETE_LINK = "DELETE FROM link WHERE id = ?";
@@ -49,9 +54,15 @@ public class JdbcLinkRepository implements LinkRepository {
     }
 
     @Override
+    public boolean findLinkInAllChats(long linkId) {
+        return jdbcTemplate.query(FIND_CHATS_BY_LINK, new BeanPropertyRowMapper<>(Link.class), linkId).stream()
+            .findFirst().isPresent();
+    }
+
+    @Override
     public Link addLink(Link link) {
         if (link.getId() == null) {
-            jdbcTemplate.update(ADD_LINK, link.getUrl(), link.getCreatedAt());
+            jdbcTemplate.update(ADD_LINK, link.getUrl(), link.getCreatedAt(), link.getUpdatedAt());
             Long id = jdbcTemplate.query(FIND_BY_URL, new BeanPropertyRowMapper<>(Link.class), link.getUrl())
                 .stream()
                 .findFirst()

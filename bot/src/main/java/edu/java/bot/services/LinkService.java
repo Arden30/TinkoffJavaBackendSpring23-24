@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 public class LinkService {
     private final ScrapperWebClient scrapperWebClient;
 
-    private final static String INVALID = "Invalid link";
-
     public Optional<LinkResponse> addLink(long id, AddLinkRequest addLinkRequest) {
         return scrapperWebClient.addLink(id, addLinkRequest);
     }

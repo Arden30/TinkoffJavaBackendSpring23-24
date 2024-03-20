@@ -20,6 +20,8 @@ public interface LinkRepository {
 
     boolean removeLink(long linkId);
 
+    boolean findLinkInAllChats(long linkId);
+
     boolean removeLinkByChat(long chatId, long linkId);
 
     List<Link> recentlyUpdated(OffsetDateTime oldThan);
