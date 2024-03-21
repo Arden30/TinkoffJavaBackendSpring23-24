@@ -1,6 +1,6 @@
 package edu.java.links.parser;
 
-import edu.java.links.response.GitHubResponse;
+import edu.java.links.response.GitHubParsingResponse;
 import edu.java.links.response.ParsingResponse;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -17,7 +17,7 @@ public class GitHubParser extends LinkParser {
             String name = matcher.group(1);
             String repo = matcher.group(2);
 
-            return Optional.of(new GitHubResponse(name, repo));
+            return Optional.of(new GitHubParsingResponse(name, repo));
         }
 
         return parseNext(url);

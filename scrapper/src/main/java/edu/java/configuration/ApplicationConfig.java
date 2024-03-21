@@ -15,11 +15,11 @@ public record ApplicationConfig(
     Scheduler scheduler
 ) {
     @Bean
-    public Duration update() {
-        return scheduler().update();
+    public Duration forceCheckDelay() {
+        return scheduler.forceCheckDelay();
     }
 
-    public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration update,
+    public record Scheduler(boolean enable, @NotNull Duration interval,
                             @NotNull Duration forceCheckDelay) {
     }
 }
