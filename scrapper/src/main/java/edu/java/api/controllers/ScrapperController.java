@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScrapperController {
     private final ChatService chatService;
     private final LinkService linkService;
-
     private final LinkTypeService linkTypeService;
 
     @PostMapping("/tg-chat/{id}")

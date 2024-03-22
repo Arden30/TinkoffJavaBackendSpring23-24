@@ -6,4 +6,5 @@
 
 <suppressions>
     <suppress checks="InnerAssignment"/>
+    <suppress checks="UncommentedMain"/>
 </suppressions>

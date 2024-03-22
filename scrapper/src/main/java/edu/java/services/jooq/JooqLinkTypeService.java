@@ -1,22 +1,24 @@
-package edu.java.services.jdbc;
+package edu.java.services.jooq;
 
 import edu.java.clients.github.GitHubClient;
 import edu.java.links.parser.LinkParser;
 import edu.java.links.response.GitHubParsingResponse;
 import edu.java.model.GitHubRepo;
 import edu.java.model.Link;
-import edu.java.repository.jdbc.JdbcGitHubRepository;
+import edu.java.repository.jooq.JooqGitHubRepository;
 import edu.java.services.LinkTypeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Primary
 @Service
 @RequiredArgsConstructor
-public class JdbcLinkTypeService implements LinkTypeService {
+public class JooqLinkTypeService implements LinkTypeService {
     private final LinkParser linkParser;
     private final GitHubClient gitHubClient;
-    private final JdbcGitHubRepository jdbcGitHubRepository;
+    private final JooqGitHubRepository jooqGitHubRepository;
 
     @Override
     @Transactional
@@ -38,7 +40,7 @@ public class JdbcLinkTypeService implements LinkTypeService {
                     gitHubRepo.setStars(gitHubResponse.get().getStars());
                     gitHubRepo.setIssues(gitHubResponse.get().getIssues());
 
-                    jdbcGitHubRepository.addRepo(gitHubRepo);
+                    jooqGitHubRepository.addRepo(gitHubRepo);
                 }
             }
         }
@@ -53,7 +55,7 @@ public class JdbcLinkTypeService implements LinkTypeService {
             var parseResp = parserResponse.get();
 
             if (parseResp instanceof GitHubParsingResponse) {
-                jdbcGitHubRepository.delete(link.getId());
+                jooqGitHubRepository.delete(link.getId());
             }
         }
     }

@@ -16,6 +16,7 @@ import edu.java.repository.LinkRepository;
 import java.net.URI;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class LinkUpdaterImpl implements LinkUpdater {
         StringBuilder stringBuilder = new StringBuilder();
         var response = gitHubClient.fetchUser(resp.name(), resp.repo());
         if (response.isPresent()) {
-            if (!link.getUpdatedAt().equals(response.get().getUpdatedAt())) {
+            if (!link.getUpdatedAt().withOffsetSameInstant(ZoneOffset.UTC).equals(response.get().getUpdatedAt())) {
                 link.setUpdatedAt(response.get().getUpdatedAt());
                 stringBuilder.append(response.get().getName()).append(" was updated!").append("\n");
             }
