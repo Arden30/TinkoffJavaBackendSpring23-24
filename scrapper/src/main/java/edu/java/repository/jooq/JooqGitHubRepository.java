@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-import static ru.tinkoff.edu.java.scrapper.domain.jooq.tables.GithubRepos.GITHUB_REPOS;
+import static edu.java.domain.jooq.tables.GithubRepos.GITHUB_REPOS;
 
 @Primary
 @Repository

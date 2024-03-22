@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-import static ru.tinkoff.edu.java.scrapper.domain.jooq.tables.Chat.CHAT;
-import static ru.tinkoff.edu.java.scrapper.domain.jooq.tables.LinkToChat.LINK_TO_CHAT;
+import static edu.java.domain.jooq.tables.Chat.CHAT;
+import static edu.java.domain.jooq.tables.LinkToChat.LINK_TO_CHAT;
 
 @Primary
 @Repository
