@@ -26,7 +26,8 @@ public class JooqGitHubRepository implements GitHubRepository {
     @Override
     public void addRepo(GitHubRepo gitHubRepo) {
         dsl.insertInto(GITHUB_REPOS, GITHUB_REPOS.LINK_ID, GITHUB_REPOS.STARS, GITHUB_REPOS.ISSUES)
-            .values(gitHubRepo.getLinkId(), gitHubRepo.getStars(), gitHubRepo.getIssues());
+            .values(gitHubRepo.getLinkId(), gitHubRepo.getStars(), gitHubRepo.getIssues())
+            .execute();
     }
 
     @Override
@@ -35,7 +36,8 @@ public class JooqGitHubRepository implements GitHubRepository {
             .set(GITHUB_REPOS.LINK_ID, gitHubRepo.getLinkId())
             .set(GITHUB_REPOS.STARS, gitHubRepo.getStars())
             .set(GITHUB_REPOS.ISSUES, gitHubRepo.getIssues())
-            .where(GITHUB_REPOS.LINK_ID.eq(gitHubRepo.getLinkId()));
+            .where(GITHUB_REPOS.LINK_ID.eq(gitHubRepo.getLinkId()))
+            .execute();
     }
 
     @Override

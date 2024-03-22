@@ -20,6 +20,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -78,14 +79,18 @@ public class LinkUpdaterImpl implements LinkUpdater {
 
             var repository = gitHubRepository.findByLinkId(link.getId());
             if (repository.isPresent()) {
-                if (issues > repository.get().getIssues()) {
+                if (!Objects.equals(issues, repository.get().getIssues())) {
+                    if (issues > repository.get().getIssues()) {
+                        stringBuilder.append("New issue was opened").append("\n");
+                    }
                     repository.get().setIssues(issues);
-                    stringBuilder.append("New issue was opened").append("\n");
                 }
 
-                if (stars > repository.get().getStars()) {
+                if (!Objects.equals(stars, repository.get().getStars())) {
+                    if (stars > repository.get().getStars()) {
+                        stringBuilder.append("New star was added").append("\n");
+                    }
                     repository.get().setStars(stars);
-                    stringBuilder.append("New star was added").append("\n");
                 }
 
                 gitHubRepository.saveChanges(repository.get());

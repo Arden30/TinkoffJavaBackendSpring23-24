@@ -48,11 +48,11 @@ public class JooqLinkRepository implements LinkRepository {
     @Override
     public Link addLink(Link link) {
         if (link.getId() == null) {
-            Long id = dsl.insertInto(LINK, LINK.URL, LINK.CREATED_AT, LINK.UPDATED_AT)
+            dsl.insertInto(LINK, LINK.URL, LINK.CREATED_AT, LINK.UPDATED_AT)
                 .values(link.getUrl(), link.getCreatedAt(), link.getUpdatedAt())
-                .returning(LINK.ID)
-                .fetchInto(Long.class)
-                .get(0);
+                .execute();
+
+            Long id = dsl.select(LINK.ID).from(LINK).where(LINK.URL.eq(link.getUrl())).fetchInto(Long.class).get(0);
             link.setId(id);
         }
 
@@ -63,7 +63,8 @@ public class JooqLinkRepository implements LinkRepository {
     public void saveChanges(Link link) {
         dsl.update(LINK)
             .set(LINK.UPDATED_AT, link.getUpdatedAt())
-            .where(LINK.ID.eq(link.getId()));
+            .where(LINK.ID.eq(link.getId()))
+            .execute();
     }
 
     @Override

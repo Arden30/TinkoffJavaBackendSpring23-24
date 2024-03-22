@@ -37,6 +37,10 @@ public class ListCommand implements Command {
         Optional<ListLinksResponse> linkResponses = linkService.getLinks(id);
 
         if (linkResponses.isEmpty()) {
+            return new SendMessage(id, "Problems with server, try again later");
+        }
+
+        if (linkResponses.get().list().isEmpty()) {
             return new SendMessage(id, "There are no tracked links");
         }
 
