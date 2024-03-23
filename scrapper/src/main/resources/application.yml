@@ -1,8 +1,7 @@
 app:
   scheduler:
     enable: true
-    interval: 10000
-    update: 90000
+    interval: 50000
     force-check-delay: 10000
 
 github-client:

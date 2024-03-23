@@ -2,8 +2,8 @@ package edu.java.scrapper.integration_tests;
 
 import edu.java.model.Chat;
 import edu.java.model.Link;
-import edu.java.repository.jdbc.JdbcChatRepository;
-import edu.java.repository.jdbc.JdbcLinkRepository;
+import edu.java.repository.jooq.JooqChatRepository;
+import edu.java.repository.jooq.JooqLinkRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +18,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 @Transactional
 @Rollback
-public class JdbcRepositoryTest extends IntegrationTest {
+public class JooqRepositoryTest extends IntegrationTest {
     @Autowired
-    private JdbcLinkRepository linkRepository;
+    private JooqLinkRepository linkRepository;
     @Autowired
-    private JdbcChatRepository chatRepository;
+    private JooqChatRepository chatRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private final Link link = new Link();

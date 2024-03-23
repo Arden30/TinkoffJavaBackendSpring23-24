@@ -36,7 +36,7 @@ public class GitHubClientTest {
         return String.format("""
             {
             "id":1,
-            "name":"%s",
+            "full_name":"%s",
             "description": "test description",
             "owner": {
                 "id":2,

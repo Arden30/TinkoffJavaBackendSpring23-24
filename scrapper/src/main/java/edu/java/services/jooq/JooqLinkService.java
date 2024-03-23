@@ -1,19 +1,21 @@
-package edu.java.services.jdbc;
+package edu.java.services.jooq;
 
 import edu.java.api.exceptions.NoSuchLinkException;
 import edu.java.model.Link;
-import edu.java.repository.jdbc.JdbcLinkRepository;
+import edu.java.repository.jooq.JooqLinkRepository;
 import edu.java.services.LinkService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Primary
 @Service
 @RequiredArgsConstructor
-public class JdbcLinkService implements LinkService {
-    private final JdbcLinkRepository jdbcLinkRepository;
+public class JooqLinkService implements LinkService {
+    private final JooqLinkRepository jooqLinkRepository;
 
     @Override
     @Transactional
@@ -23,8 +25,8 @@ public class JdbcLinkService implements LinkService {
         newLink.setUpdatedAt(OffsetDateTime.now());
         newLink.setUrl(url);
 
-        Link link = jdbcLinkRepository.findByUrl(url).orElseGet(() -> jdbcLinkRepository.addLink(newLink));
-        jdbcLinkRepository.addLinkToChat(tgChatId, link.getId());
+        Link link = jooqLinkRepository.findByUrl(url).orElseGet(() -> jooqLinkRepository.addLink(newLink));
+        jooqLinkRepository.addLinkToChat(tgChatId, link.getId());
 
         return link;
     }
@@ -32,11 +34,11 @@ public class JdbcLinkService implements LinkService {
     @Override
     @Transactional
     public Link remove(long tgChatId, String url) {
-        Link link = jdbcLinkRepository.findByUrl(url).orElseThrow(() -> new NoSuchLinkException("Link was not found"));
-        jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId());
+        Link link = jooqLinkRepository.findByUrl(url).orElseThrow(() -> new NoSuchLinkException("Link was not found"));
+        jooqLinkRepository.removeLinkByChat(tgChatId, link.getId());
 
-        if (!jdbcLinkRepository.findLinkInAllChats(link.getId())) {
-            jdbcLinkRepository.removeLink(link.getId());
+        if (!jooqLinkRepository.findLinkInAllChats(link.getId())) {
+            jooqLinkRepository.removeLink(link.getId());
         }
 
         return link;
@@ -44,6 +46,6 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public List<Link> listAll(long tgChatId) {
-        return jdbcLinkRepository.findAllByChat(tgChatId);
+        return jooqLinkRepository.findAllByChat(tgChatId);
     }
 }

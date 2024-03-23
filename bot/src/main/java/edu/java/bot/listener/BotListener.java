@@ -10,7 +10,6 @@ import edu.java.bot.commands.Command;
 import edu.java.bot.links.LinkValidator;
 import edu.java.bot.model.State;
 import edu.java.bot.services.LinkService;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class BotListener implements UpdatesListener, AutoCloseable {
             State state = states.getOrDefault(id, State.DEFAULT);
 
             if (!state.equals(State.DEFAULT)) {
-                if (!linkValidator.isValid(URI.create(message))) {
+                if (!linkValidator.isValid(message)) {
                     telegramBot.execute(new SendMessage(
                         id,
                         "Link must be on GitHub repository or StackOverflow question!"

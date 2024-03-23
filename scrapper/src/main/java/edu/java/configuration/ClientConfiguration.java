@@ -5,6 +5,9 @@ import edu.java.clients.github.GitHubClient;
 import edu.java.clients.github.GitHubClientImpl;
 import edu.java.clients.stackoverflow.StackOverFlowClient;
 import edu.java.clients.stackoverflow.StackOverFlowClientImpl;
+import edu.java.links.parser.GitHubParser;
+import edu.java.links.parser.LinkParser;
+import edu.java.links.parser.StackOverFlowParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +18,7 @@ public class ClientConfiguration {
     private final GitHubConfig gitHubConfig;
     private final StackOverFlowConfig stackOverflowConfig;
     private final BotConfig botConfig;
+    private final LinkParser linkParser = LinkParser.createChain(new GitHubParser(), new StackOverFlowParser());
 
     @Bean
     public BotWebClient botWebClient() {
@@ -30,5 +34,10 @@ public class ClientConfiguration {
     public StackOverFlowClient stackOverFlowClient() {
         return new StackOverFlowClientImpl(stackOverflowConfig);
 
+    }
+
+    @Bean
+    public LinkParser linkParser() {
+        return linkParser;
     }
 }
