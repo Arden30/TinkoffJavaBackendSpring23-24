@@ -26,7 +26,7 @@ public class GitHubClientTest {
             )));
 
         GitHubClient gitHubClient = new GitHubClientImpl(baseUrl);
-        GitHubResponse gitHubResponse = gitHubClient.fetchUser(name, repository);
+        GitHubResponse gitHubResponse = gitHubClient.fetchUser(name, repository).get();
 
         assertThat(gitHubResponse.getGitHubOwner().getLogin()).isEqualTo(name);
         assertThat(gitHubResponse.getName()).isEqualTo(repository);
@@ -36,7 +36,7 @@ public class GitHubClientTest {
         return String.format("""
             {
             "id":1,
-            "name":"%s",
+            "full_name":"%s",
             "description": "test description",
             "owner": {
                 "id":2,

@@ -32,9 +32,10 @@ public class LiquibaseIntegrationTest extends IntegrationTest {
     @Test
     @DisplayName("Simple liquibase integration test")
     void test() throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO link (url, created_at) VALUES (?, ?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO link (url, created_at, updated_at) VALUES (?, ?, ?)");
         statement.setString(1, link);
         statement.setTimestamp(2, Timestamp.valueOf(date));
+        statement.setTimestamp(3, Timestamp.valueOf(date));
         statement.executeUpdate();
 
         PreparedStatement selectStatement = connection.prepareStatement("SELECT * FROM link");

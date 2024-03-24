@@ -2,16 +2,19 @@ package edu.java.bot.commands;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.model.User;
-import edu.java.bot.services.UserService;
+import edu.java.bot.client.dto.response.LinkResponse;
+import edu.java.bot.client.dto.response.ListLinksResponse;
+import edu.java.bot.model.State;
+import edu.java.bot.services.LinkService;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ListCommand implements Command {
-    private final UserService userService;
+    private final LinkService linkService;
 
     @Override
     public String command() {
@@ -24,27 +27,37 @@ public class ListCommand implements Command {
     }
 
     @Override
+    public State state() {
+        return State.DEFAULT;
+    }
+
+    @Override
     public SendMessage handle(Update update) {
         Long id = update.message().chat().id();
-        Optional<User> userOptional = userService.findById(id);
+        Optional<ListLinksResponse> linkResponses = linkService.getLinks(id);
 
-        if (userOptional.isEmpty()) {
-            return new SendMessage(id, "Please, register (input command /start)");
+        if (linkResponses.isEmpty()) {
+            return new SendMessage(id, "Problems with server, try again later");
         }
 
-        return new SendMessage(id, createResponse(userOptional.get().getLinks()));
-    }
-
-    private String createResponse(List<URI> uriList) {
-        StringBuilder response = new StringBuilder();
-
-        if (uriList.isEmpty()) {
-            return "List is empty";
+        if (linkResponses.get().list().isEmpty()) {
+            return new SendMessage(id, "There are no tracked links");
         }
 
-        response.append("Your links: \n");
-        uriList.forEach(uri -> response.append(uri.toString()).append("\n"));
+        List<LinkResponse> list = linkResponses.get().list();
 
-        return response.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Your links: \n");
+
+        String links = list
+            .stream()
+            .map(LinkResponse::url)
+            .map(URI::toString)
+            .collect(Collectors.joining("\n"));
+
+        stringBuilder.append(links);
+
+        return new SendMessage(id, stringBuilder.toString());
     }
+
 }
