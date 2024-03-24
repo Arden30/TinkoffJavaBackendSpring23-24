@@ -4,6 +4,7 @@ import edu.java.model.Chat;
 import edu.java.model.Link;
 import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.repository.jdbc.JdbcLinkRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,10 @@ public class JdbcRepositoryTest extends IntegrationTest {
 
     @BeforeEach
     void setUp() {
-        link.setId(1L);
         link.setUrl(url);
         link.setCreatedAt(OffsetDateTime.now());
         link.setUpdatedAt(OffsetDateTime.now());
 
-        link2.setId(2L);
         link2.setUrl(url2);
         link2.setCreatedAt(OffsetDateTime.now());
         link2.setUpdatedAt(OffsetDateTime.now());
@@ -48,6 +47,7 @@ public class JdbcRepositoryTest extends IntegrationTest {
     }
 
     @BeforeEach
+    @AfterEach
     public void restartIdentity() {
         jdbcTemplate.update("TRUNCATE link_to_chat RESTART IDENTITY");
         jdbcTemplate.update("TRUNCATE chat RESTART IDENTITY CASCADE");
@@ -56,20 +56,18 @@ public class JdbcRepositoryTest extends IntegrationTest {
 
     @Test
     void addAndFindLinkTest() {
-        linkRepository.addLink(link);
-
         chatRepository.addChat(chat);
-        jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", link.getUrl(), link.getCreatedAt(), link.getUpdatedAt());
+        linkRepository.addLink(link);
         linkRepository.addLinkToChat(chat.getId(), link.getId());
 
         assertThat(linkRepository.findById(link.getId()).get().getUrl()).isEqualTo(url);
-        assertThat(linkRepository.findAllByChat(chat.getId()).get(0).getUrl()).isEqualTo(url);
+        assertThat(linkRepository.findLinksByChatsId(chat.getId()).get(0).getUrl()).isEqualTo(url);
     }
 
     @Test
     void removeAndFindLinkTest() {
         jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", link.getUrl(), link.getCreatedAt(), link.getUpdatedAt());
-        boolean res = linkRepository.removeLink(link.getId());
+        boolean res = linkRepository.removeLink(1L);
 
         assertThat(res).isTrue();
         assertThat(linkRepository.findByUrl(link.getUrl())).isEmpty();
@@ -96,12 +94,12 @@ public class JdbcRepositoryTest extends IntegrationTest {
         jdbcTemplate.update("INSERT INTO chat(id, created_at) VALUES (?, ?)", chat.getId(), chat.getCreatedAt());
 
         jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url, link.getCreatedAt(), link.getUpdatedAt());
-        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), link.getId());
+        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 1L);
 
         jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url2, link.getCreatedAt(), link.getUpdatedAt());
-        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), link2.getId());
+        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 2L);
 
-        List<Link> links = linkRepository.findAllByChat(chat.getId());
+        List<Link> links = linkRepository.findLinksByChatsId(chat.getId());
         assertThat(links.get(0).getUrl()).isEqualTo(url);
         assertThat(links.get(1).getUrl()).isEqualTo(url2);
     }
@@ -111,14 +109,14 @@ public class JdbcRepositoryTest extends IntegrationTest {
         jdbcTemplate.update("INSERT INTO chat(id, created_at) VALUES (?, ?)", chat.getId(), chat.getCreatedAt());
 
         jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url, link.getCreatedAt(), link.getUpdatedAt());
-        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), link.getId());
+        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 1L);
 
         jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url2, link.getCreatedAt(), link.getUpdatedAt());
-        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), link2.getId());
+        jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 2L);
 
-        boolean res = linkRepository.removeLinkByChat(chat.getId(), link.getId());
+        boolean res = linkRepository.removeLinkByChat(chat.getId(), 1L);
 
-        List<Link> links = linkRepository.findAllByChat(chat.getId());
+        List<Link> links = linkRepository.findLinksByChatsId(chat.getId());
 
         assertThat(res).isTrue();
         assertThat(links.size()).isEqualTo(1);

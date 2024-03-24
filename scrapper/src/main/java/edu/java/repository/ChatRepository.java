@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface ChatRepository {
     List<Chat> findAll();
 
-    List<Chat> findAllByLink(long linkId);
+    List<Chat> findChatsByLinksId(long linkId);
 
     Optional<Chat> findById(long chatId);
 
