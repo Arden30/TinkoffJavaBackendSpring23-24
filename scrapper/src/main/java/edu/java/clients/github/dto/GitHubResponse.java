@@ -9,6 +9,6 @@ public class GitHubResponse {
     String name;
     @JsonProperty("owner")
     GitHubOwner gitHubOwner;
-    @JsonProperty("created_at")
-    OffsetDateTime createdAt;
+    @JsonProperty("updated_at")
+    OffsetDateTime updatedAt;
 }

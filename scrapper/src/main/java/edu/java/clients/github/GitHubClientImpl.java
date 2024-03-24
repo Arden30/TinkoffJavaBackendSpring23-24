@@ -2,6 +2,7 @@ package edu.java.clients.github;
 
 import edu.java.clients.github.dto.GitHubResponse;
 import edu.java.configuration.GitHubConfig;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,11 +31,11 @@ public class GitHubClientImpl implements GitHubClient {
     }
 
     @Override
-    public GitHubResponse fetchUser(String user, String repo) {
+    public Optional<GitHubResponse> fetchUser(String user, String repo) {
         return webClient.get()
             .uri("/repos/{user}/{repo}", user, repo)
             .retrieve()
             .bodyToMono(GitHubResponse.class)
-            .block();
+            .blockOptional();
     }
 }
