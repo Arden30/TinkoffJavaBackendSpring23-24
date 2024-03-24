@@ -7,12 +7,8 @@ import edu.java.repository.jooq.JooqChatRepository;
 import edu.java.services.ChatService;
 import java.time.OffsetDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Primary
-@Service
 @RequiredArgsConstructor
 public class JooqChatService implements ChatService {
     private final JooqChatRepository jooqChatRepository;

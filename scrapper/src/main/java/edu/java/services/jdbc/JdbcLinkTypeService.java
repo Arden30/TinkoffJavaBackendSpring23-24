@@ -8,10 +8,8 @@ import edu.java.model.Link;
 import edu.java.repository.jdbc.JdbcGitHubRepository;
 import edu.java.services.LinkTypeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
 public class JdbcLinkTypeService implements LinkTypeService {
     private final LinkParser linkParser;

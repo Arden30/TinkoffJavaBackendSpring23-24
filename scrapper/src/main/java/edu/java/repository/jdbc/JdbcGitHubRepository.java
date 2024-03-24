@@ -1,14 +1,12 @@
 package edu.java.repository.jdbc;
 
+import edu.java.configuration.JdbcMappersConfiguration;
 import edu.java.model.GitHubRepo;
 import edu.java.repository.GitHubRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @RequiredArgsConstructor
 public class JdbcGitHubRepository implements GitHubRepository {
     private final static String FIND_BY_ID = "SELECT * FROM github_repos WHERE link_id = ?";
@@ -17,9 +15,11 @@ public class JdbcGitHubRepository implements GitHubRepository {
     private final static String DELETE_LINK = "DELETE FROM github_repos WHERE link_id = ?";
     private final JdbcTemplate jdbcTemplate;
 
+    private final JdbcMappersConfiguration jdbcMappersConfiguration;
+
     @Override
     public Optional<GitHubRepo> findByLinkId(long linkId) {
-        return jdbcTemplate.query(FIND_BY_ID, new BeanPropertyRowMapper<>(GitHubRepo.class), linkId).stream()
+        return jdbcTemplate.query(FIND_BY_ID, jdbcMappersConfiguration.gitHubRepoMapper(), linkId).stream()
             .findFirst();
     }
 

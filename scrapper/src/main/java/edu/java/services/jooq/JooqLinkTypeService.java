@@ -8,12 +8,9 @@ import edu.java.model.Link;
 import edu.java.repository.jooq.JooqGitHubRepository;
 import edu.java.services.LinkTypeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Primary
-@Service
+
 @RequiredArgsConstructor
 public class JooqLinkTypeService implements LinkTypeService {
     private final LinkParser linkParser;

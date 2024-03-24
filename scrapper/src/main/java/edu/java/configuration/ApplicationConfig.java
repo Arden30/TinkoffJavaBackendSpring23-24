@@ -15,7 +15,10 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
 public record ApplicationConfig(
     @NotNull
-    Scheduler scheduler
+    Scheduler scheduler,
+
+    @NotNull
+    AccessType databaseAccessType
 ) {
     @Bean
     public Duration forceCheckDelay() {
@@ -28,6 +31,11 @@ public record ApplicationConfig(
             .withRenderSchema(false)
             .withRenderFormatted(true)
             .withRenderQuotedNames(RenderQuotedNames.NEVER);
+    }
+
+    public enum AccessType {
+        JDBC, JPA,
+        JOOQ
     }
 
     public record Scheduler(boolean enable, @NotNull Duration interval,

@@ -1,18 +1,14 @@
 package edu.java.repository.jdbc;
 
-import edu.java.api.exceptions.DoubleLinkException;
-import edu.java.api.exceptions.NoSuchLinkException;
+import edu.java.configuration.JdbcMappersConfiguration;
 import edu.java.model.Link;
 import edu.java.repository.LinkRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @RequiredArgsConstructor
 public class JdbcLinkRepository implements LinkRepository {
     private final static String FIND_ALL = """
@@ -38,24 +34,26 @@ public class JdbcLinkRepository implements LinkRepository {
     private final static String RECENTLY_UPDATED = "SELECT * FROM link WHERE updated_at < ?";
     private final JdbcTemplate jdbcTemplate;
 
+    private final JdbcMappersConfiguration jdbcMappersConfiguration;
+
     @Override
     public List<Link> findAllByChat(long chatId) {
-        return jdbcTemplate.query(FIND_ALL, new BeanPropertyRowMapper<>(Link.class), chatId);
+        return jdbcTemplate.query(FIND_ALL, jdbcMappersConfiguration.linkMapper(), chatId);
     }
 
     @Override
     public Optional<Link> findById(long linkId) {
-        return jdbcTemplate.query(FIND_BY_ID, new BeanPropertyRowMapper<>(Link.class), linkId).stream().findFirst();
+        return jdbcTemplate.query(FIND_BY_ID, jdbcMappersConfiguration.linkMapper(), linkId).stream().findFirst();
     }
 
     @Override
     public Optional<Link> findByUrl(String url) {
-        return jdbcTemplate.query(FIND_BY_URL, new BeanPropertyRowMapper<>(Link.class), url).stream().findFirst();
+        return jdbcTemplate.query(FIND_BY_URL, jdbcMappersConfiguration.linkMapper(), url).stream().findFirst();
     }
 
     @Override
     public boolean findLinkInAllChats(long linkId) {
-        return jdbcTemplate.query(FIND_CHATS_BY_LINK, new BeanPropertyRowMapper<>(Link.class), linkId).stream()
+        return jdbcTemplate.query(FIND_CHATS_BY_LINK, jdbcMappersConfiguration.linkMapper(), linkId).stream()
             .findFirst().isPresent();
     }
 
@@ -63,7 +61,7 @@ public class JdbcLinkRepository implements LinkRepository {
     public Link addLink(Link link) {
         if (link.getId() == null) {
             jdbcTemplate.update(ADD_LINK, link.getUrl(), link.getCreatedAt(), link.getUpdatedAt());
-            Long id = jdbcTemplate.query(FIND_BY_URL, new BeanPropertyRowMapper<>(Link.class), link.getUrl())
+            Long id = jdbcTemplate.query(FIND_BY_URL, jdbcMappersConfiguration.linkMapper(), link.getUrl())
                 .stream()
                 .findFirst()
                 .get()
@@ -77,7 +75,7 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public boolean addLinkToChat(long chatId, long linkId) {
         if (Boolean.TRUE.equals(jdbcTemplate.queryForObject(EXISTS_IN_CHAT, boolean.class, chatId, linkId))) {
-            throw new DoubleLinkException("Link is already being tracked");
+            return false;
         }
 
         jdbcTemplate.update(ADD_TO_CHAT, chatId, linkId);
@@ -96,15 +94,11 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public boolean removeLinkByChat(long chatId, long linkId) {
-        if (jdbcTemplate.update(DELETE_LINK_IN_CHAT, chatId, linkId) >= 1) {
-            return true;
-        } else {
-            throw new NoSuchLinkException("No such link");
-        }
+        return jdbcTemplate.update(DELETE_LINK_IN_CHAT, chatId, linkId) >= 1;
     }
 
     @Override
     public List<Link> recentlyUpdated(OffsetDateTime oldThan) {
-        return jdbcTemplate.query(RECENTLY_UPDATED, new BeanPropertyRowMapper<>(Link.class), oldThan);
+        return jdbcTemplate.query(RECENTLY_UPDATED, jdbcMappersConfiguration.linkMapper(), oldThan);
     }
 }

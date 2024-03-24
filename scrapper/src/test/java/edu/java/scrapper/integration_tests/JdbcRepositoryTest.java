@@ -4,12 +4,15 @@ import edu.java.model.Chat;
 import edu.java.model.Link;
 import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.repository.jdbc.JdbcLinkRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -31,6 +34,11 @@ public class JdbcRepositoryTest extends IntegrationTest {
     private final String url = "https://github.com/Arden30/TinkoffJavaBackendSpring23-24";
     private final String url2 = "https://github.com/sanyarnd/java-course-2023-backend-template";
 
+    @DynamicPropertySource
+    public static void setJdbcAccessType(DynamicPropertyRegistry registry) {
+        registry.add("app.database-access-type", () -> "jdbc");
+    }
+
     @BeforeEach
     void setUp() {
         link.setUrl(url);
@@ -46,6 +54,7 @@ public class JdbcRepositoryTest extends IntegrationTest {
     }
 
     @BeforeEach
+    @AfterEach
     public void restartIdentity() {
         jdbcTemplate.update("TRUNCATE link_to_chat RESTART IDENTITY");
         jdbcTemplate.update("TRUNCATE chat RESTART IDENTITY CASCADE");
