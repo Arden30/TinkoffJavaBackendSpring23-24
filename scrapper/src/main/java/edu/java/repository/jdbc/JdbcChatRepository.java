@@ -22,6 +22,7 @@ public class JdbcChatRepository implements ChatRepository {
     private final static String DELETE_CHAT = "DELETE FROM chat WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
     private final JdbcMappersConfiguration jdbcMappersConfiguration;
+    
     @Override
     public List<Chat> findAll() {
         return jdbcTemplate.query(FIND_ALL, new BeanPropertyRowMapper<>(Chat.class));
