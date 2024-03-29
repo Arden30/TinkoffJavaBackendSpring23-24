@@ -54,6 +54,6 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public List<Link> listAll(long tgChatId) {
-        return jdbcLinkRepository.findLinksByChatsId(tgChatId);
+        return jdbcLinkRepository.findAllByChat(tgChatId);
     }
 }

@@ -31,7 +31,7 @@ public class JdbcChatRepository implements ChatRepository {
     }
 
     @Override
-    public List<Chat> findChatsByLinksId(long linkId) {
+    public List<Chat> findAllByLink(long linkId) {
         return jdbcTemplate.query(FIND_ALL_BY_LINK, jdbcMappersConfig.chatMapper(), linkId);
     }
 

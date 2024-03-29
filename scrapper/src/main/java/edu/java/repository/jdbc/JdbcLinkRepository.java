@@ -40,7 +40,7 @@ public class JdbcLinkRepository implements LinkRepository {
     private final JdbcMappersConfig jdbcMappersConfig;
 
     @Override
-    public List<Link> findLinksByChatsId(long chatId) {
+    public List<Link> findAllByChat(long chatId) {
         return jdbcTemplate.query(FIND_ALL, jdbcMappersConfig.linkMapper(), chatId);
     }
 
@@ -91,7 +91,7 @@ public class JdbcLinkRepository implements LinkRepository {
     }
 
     @Override
-    public void save(Link link) {
+    public void saveChanges(Link link) {
         jdbcTemplate.update(UPDATE, link.getUpdatedAt(), link.getId());
     }
 
