@@ -1,7 +1,8 @@
 package edu.java.clients.github;
 
 import edu.java.clients.github.dto.GitHubResponse;
+import java.util.Optional;
 
 public interface GitHubClient {
-    GitHubResponse fetchUser(String user, String repo);
+    Optional<GitHubResponse> fetchUser(String user, String repo);
 }

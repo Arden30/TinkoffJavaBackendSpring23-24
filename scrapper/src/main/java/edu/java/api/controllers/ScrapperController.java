@@ -2,9 +2,13 @@ package edu.java.api.controllers;
 
 import edu.java.api.dto.request.AddLinkRequest;
 import edu.java.api.dto.request.RemoveLinkRequest;
+import edu.java.api.dto.response.LinkResponse;
 import edu.java.api.dto.response.ListLinksResponse;
-import edu.java.services.UserService;
+import edu.java.services.ChatService;
+import edu.java.services.LinkService;
 import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,38 +26,49 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 public class ScrapperController {
-    private final UserService userService;
+    private final ChatService chatService;
+    private final LinkService linkService;
 
     @PostMapping("/tg-chat/{id}")
     public ResponseEntity<?> registerChat(@PathVariable("id") long id) {
-        userService.registerChat(id);
+        chatService.register(id);
         return ResponseEntity.ok().body("Chat " + id + " was successfully registered!");
     }
 
     @DeleteMapping("/tg-chat/{id}")
     public ResponseEntity<?> deleteChat(@PathVariable("id") long id) {
-        userService.deleteChat(id);
+        chatService.unregister(id);
         return ResponseEntity.ok().body("Chat with id " + id + " was successfully deleted!");
     }
 
     @GetMapping("/links")
     public ResponseEntity<ListLinksResponse> getLinks(@RequestHeader("Tg-Chat-Id") long id) {
-        return ResponseEntity.ok(userService.getLinks(id));
+        List<LinkResponse> links = linkService
+            .listAll(id)
+            .stream()
+            .map(link -> new LinkResponse(link.getId(), URI.create(link.getUrl())))
+            .toList();
+
+        return ResponseEntity.ok(new ListLinksResponse(links));
     }
 
     @PostMapping("/links")
-    public ResponseEntity<?> addLinks(
+    public ResponseEntity<LinkResponse> addLinks(
         @RequestHeader("Tg-Chat-Id") long id,
         @RequestBody @Valid AddLinkRequest request
     ) {
-        return ResponseEntity.ok(userService.addLink(id, request.link()));
+        linkService.add(id, request.link().toString());
+
+        return ResponseEntity.ok(new LinkResponse(id, request.link()));
     }
 
     @DeleteMapping("/links")
-    public ResponseEntity<?> deleteLink(
+    public ResponseEntity<LinkResponse> deleteLink(
         @RequestHeader("Tg-Chat-Id") long id,
         @RequestBody @Valid RemoveLinkRequest request
     ) {
-        return ResponseEntity.ok(userService.removeLink(id, request.link()));
+        linkService.remove(id, request.link().toString());
+
+        return ResponseEntity.ok(new LinkResponse(id, request.link()));
     }
 }
