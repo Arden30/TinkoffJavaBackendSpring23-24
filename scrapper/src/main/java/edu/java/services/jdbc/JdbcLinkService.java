@@ -1,5 +1,6 @@
 package edu.java.services.jdbc;
 
+import edu.java.api.exceptions.DoubleLinkException;
 import edu.java.api.exceptions.NoSuchLinkException;
 import edu.java.links.listener.LinkListener;
 import edu.java.model.Link;
@@ -26,7 +27,9 @@ public class JdbcLinkService implements LinkService {
         newLink.setUrl(url);
 
         Link link = jdbcLinkRepository.findByUrl(url).orElseGet(() -> jdbcLinkRepository.addLink(newLink));
-        jdbcLinkRepository.addLinkToChat(tgChatId, link.getId());
+        if (!jdbcLinkRepository.addLinkToChat(tgChatId, link.getId())) {
+            throw new DoubleLinkException("Link is already being tracked");
+        }
 
         linkListeners.forEach(listener -> listener.onLinkAdd(link));
 
@@ -37,7 +40,9 @@ public class JdbcLinkService implements LinkService {
     @Transactional
     public Link remove(long tgChatId, String url) {
         Link link = jdbcLinkRepository.findByUrl(url).orElseThrow(() -> new NoSuchLinkException("Link was not found"));
-        jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId());
+        if (!jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId())) {
+            throw new NoSuchLinkException("No such link");
+        }
 
         if (!jdbcLinkRepository.findLinkInAllChats(link.getId())) {
             jdbcLinkRepository.removeLink(link.getId());
@@ -49,6 +54,6 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public List<Link> listAll(long tgChatId) {
-        return jdbcLinkRepository.findAllByChat(tgChatId);
+        return jdbcLinkRepository.findLinksByChatsId(tgChatId);
     }
 }

@@ -1,5 +1,6 @@
 package edu.java.repository.jdbc;
 
+import edu.java.configuration.JdbcMappersConfig;
 import edu.java.model.Chat;
 import edu.java.repository.ChatRepository;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class JdbcChatRepository implements ChatRepository {
+    private final JdbcMappersConfig jdbcMappersConfig;
     private final static String FIND_ALL = "SELECT * FROM chat";
     private final static String FIND_ALL_BY_LINK = """
             SELECT chat.* FROM chat
@@ -29,13 +31,13 @@ public class JdbcChatRepository implements ChatRepository {
     }
 
     @Override
-    public List<Chat> findAllByLink(long linkId) {
-        return jdbcTemplate.query(FIND_ALL_BY_LINK, new BeanPropertyRowMapper<>(Chat.class), linkId);
+    public List<Chat> findChatsByLinksId(long linkId) {
+        return jdbcTemplate.query(FIND_ALL_BY_LINK, jdbcMappersConfig.chatMapper(), linkId);
     }
 
     @Override
     public Optional<Chat> findById(long id) {
-        return jdbcTemplate.query(FIND_BY_ID, new BeanPropertyRowMapper<>(Chat.class), id).stream().findFirst();
+        return jdbcTemplate.query(FIND_BY_ID, jdbcMappersConfig.chatMapper(), id).stream().findFirst();
     }
 
     @Override

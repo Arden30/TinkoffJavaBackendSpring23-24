@@ -23,7 +23,7 @@ public class StackOverflowLinkUpdateProcessorService implements LinkUpdateProces
         var question = stackOverFlowClient.fetchUser(Long.parseLong(response.questionId()));
         if (question.isPresent() && !link.getUpdatedAt().equals(question.get().getUpdatedAt())) {
             link.setUpdatedAt(question.get().getUpdatedAt());
-
+          
             return Optional.of(Map.entry(link, "Question " + question.get().getId() + " was updated"));
         }
 
