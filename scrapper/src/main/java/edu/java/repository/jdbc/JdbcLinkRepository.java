@@ -33,7 +33,6 @@ public class JdbcLinkRepository implements LinkRepository {
     private final static String UPDATE = "UPDATE link SET updated_at = ? WHERE id = ?";
     private final static String RECENTLY_UPDATED = "SELECT * FROM link WHERE updated_at < ?";
     private final JdbcTemplate jdbcTemplate;
-
     private final JdbcMappersConfiguration jdbcMappersConfiguration;
 
     @Override

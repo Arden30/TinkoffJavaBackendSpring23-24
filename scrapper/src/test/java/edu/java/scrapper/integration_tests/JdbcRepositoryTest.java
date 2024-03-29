@@ -38,7 +38,7 @@ public class JdbcRepositoryTest extends IntegrationTest {
     public static void setJdbcAccessType(DynamicPropertyRegistry registry) {
         registry.add("app.database-access-type", () -> "jdbc");
     }
-
+  
     @BeforeEach
     void setUp() {
         link.setUrl(url);

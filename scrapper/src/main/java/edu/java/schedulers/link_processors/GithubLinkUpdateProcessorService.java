@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GithubLinkUpdateProcessorService implements LinkUpdateProcessorService {
     private final GitHubClient gitHubClient;
-
     private final GitHubRepository gitHubRepository;
 
     @Override

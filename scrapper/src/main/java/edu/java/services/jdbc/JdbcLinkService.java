@@ -23,7 +23,6 @@ public class JdbcLinkService implements LinkService {
         newLink.setUrl(url);
 
         Link link = jdbcLinkRepository.findByUrl(url).orElseGet(() -> jdbcLinkRepository.addLink(newLink));
-
         if (!jdbcLinkRepository.addLinkToChat(tgChatId, link.getId())) {
             throw new DoubleLinkException("Link is already being tracked");
         }

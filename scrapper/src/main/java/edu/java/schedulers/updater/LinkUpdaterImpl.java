@@ -28,7 +28,6 @@ public class LinkUpdaterImpl implements LinkUpdater {
     private final BotWebClient botWebClient;
     private final Duration forceCheckDelay;
     private final LinkParser parser;
-
     private final List<LinkUpdateProcessorService> linkUpdateProcessorService;
 
     @Override

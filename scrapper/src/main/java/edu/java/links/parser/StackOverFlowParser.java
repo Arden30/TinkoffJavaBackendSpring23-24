@@ -15,7 +15,7 @@ public class StackOverFlowParser extends LinkParser {
         Matcher matcher = pattern.matcher(url.trim());
         if (matcher.find()) {
             String questionId = matcher.group(1);
-
+          
             return Optional.of(new StackOverFlowParsingResponse(questionId));
         }
 

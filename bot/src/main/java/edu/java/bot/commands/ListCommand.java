@@ -57,6 +57,7 @@ public class ListCommand implements Command {
 
         stringBuilder.append(links);
 
+
         return new SendMessage(id, stringBuilder.toString());
     }
 
