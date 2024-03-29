@@ -3,7 +3,7 @@ package edu.java.scrapper.clients;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.clients.stackoverflow.StackOverFlowClient;
 import edu.java.clients.stackoverflow.StackOverFlowClientImpl;
-import edu.java.clients.stackoverflow.dto.StackOverFlowQuestion;
+import edu.java.clients.stackoverflow.dto.StackOverFlowResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -19,16 +19,16 @@ public class StackOverFlowClientTest {
     @Test
     @DisplayName("StackOverFlow client test")
     void test() {
-        stubFor(get("/questions/" + id + "/site=stackoverflow")
+        stubFor(get("/questions/" + id)
             .willReturn(okJson(
                 getResponseBody(id, name)
             )));
 
         StackOverFlowClient stackOverFlowClient = new StackOverFlowClientImpl(baseUrl);
-        StackOverFlowQuestion stackOverFlowResponse = stackOverFlowClient.fetchUser(id).get();
+        StackOverFlowResponse stackOverFlowResponse = stackOverFlowClient.fetchUser(id);
 
-        assertThat(stackOverFlowResponse.getStackOverFlowOwner().getDisplayName()).isEqualTo(name);
-        assertThat(stackOverFlowResponse.getId()).isEqualTo(id);
+        assertThat(stackOverFlowResponse.getStackOverFlowQuestions().get(0).getStackOverFlowOwner().getDisplayName()).isEqualTo(name);
+        assertThat(stackOverFlowResponse.getStackOverFlowQuestions().get(0).getId()).isEqualTo(id);
     }
 
     String getResponseBody(long id, String name) {
@@ -44,7 +44,7 @@ public class StackOverFlowClientTest {
                                "is_answered": true,
                                "answer_count": 3,
                                "body": "test question body",
-                               "last_activity_date": "2023-09-13T21:17:36Z"
+                               "creation_date": "2023-09-13T21:17:36Z"
                            }
                    ],
                "has_more": false,

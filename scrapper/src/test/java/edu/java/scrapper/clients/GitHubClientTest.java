@@ -26,7 +26,7 @@ public class GitHubClientTest {
             )));
 
         GitHubClient gitHubClient = new GitHubClientImpl(baseUrl);
-        GitHubResponse gitHubResponse = gitHubClient.fetchUser(name, repository).get();
+        GitHubResponse gitHubResponse = gitHubClient.fetchUser(name, repository);
 
         assertThat(gitHubResponse.getGitHubOwner().getLogin()).isEqualTo(name);
         assertThat(gitHubResponse.getName()).isEqualTo(repository);

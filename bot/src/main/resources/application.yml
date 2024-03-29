@@ -8,7 +8,7 @@ spring:
     time-zone: UTC
 
 scrapper-client:
-  base-url: http://localhost:8080/scrapper/api/v1/
+  base-url: https://localhost:8090
 
 server:
   port: 8090

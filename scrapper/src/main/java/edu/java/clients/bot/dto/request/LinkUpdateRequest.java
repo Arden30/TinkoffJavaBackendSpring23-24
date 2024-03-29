@@ -4,10 +4,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.List;
-import lombok.Builder;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 
-@Builder
 public record LinkUpdateRequest(
     long id,
     @NotNull
@@ -15,5 +13,5 @@ public record LinkUpdateRequest(
     @NotBlank
     String description,
     @NotEmpty
-    List<Long> tgChatIds) {
+    List<Integer> tgChatIds) {
 }

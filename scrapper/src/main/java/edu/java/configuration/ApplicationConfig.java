@@ -3,7 +3,6 @@ package edu.java.configuration;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.annotation.Validated;
 
@@ -14,12 +13,6 @@ public record ApplicationConfig(
     @NotNull
     Scheduler scheduler
 ) {
-    @Bean
-    public Duration interval() {
-        return scheduler.interval();
-    }
-
-    public record Scheduler(boolean enable, @NotNull Duration interval,
-                            @NotNull Duration forceCheckDelay) {
+    public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
     }
 }

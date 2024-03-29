@@ -38,7 +38,7 @@ public class BotClientTest {
                 .withBody("Ok")));
 
         String actualResponse = botWebClient.sendUpdate(new LinkUpdateRequest(
-            1, URI.create("https://my/link"), "description", List.of(1L)
+            1, URI.create("https://my/link"), "description", List.of(1)
         ));
 
         assertThat(actualResponse).isEqualTo("Ok");

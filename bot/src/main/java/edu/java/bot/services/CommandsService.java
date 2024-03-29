@@ -17,27 +17,25 @@ import org.springframework.stereotype.Service;
 @Getter
 public class CommandsService {
     private final UserService userService;
-    private final LinkService linkService;
     private final Map<String, Command> commands = new HashMap<>();
 
     @Autowired
-    public CommandsService(UserService userService, LinkService linkService, List<Command> commands) {
+    public CommandsService(UserService userService, List<Command> commands) {
         this.userService = userService;
-        this.linkService = linkService;
         commands.forEach(command -> this.commands.put(command.command(), command));
     }
 
     public void setAllCommands() {
         Command help = new HelpCommand(this);
-        Command list = new ListCommand(linkService);
-        Command track = new TrackCommand();
-        Command untrack = new UntrackCommand();
+        Command list = new ListCommand(userService);
+        Command track = new TrackCommand(userService);
+        Command untrack = new UntrackCommand(userService);
         Command start = new StartCommand(userService);
 
-        this.commands.put(help.command(), help);
-        this.commands.put(list.command(), list);
-        this.commands.put(track.command(), track);
-        this.commands.put(untrack.command(), untrack);
-        this.commands.put(start.command(), start);
+        commands.put(help.command(), help);
+        commands.put(list.command(), list);
+        commands.put(track.command(), track);
+        commands.put(untrack.command(), untrack);
+        commands.put(start.command(), start);
     }
 }

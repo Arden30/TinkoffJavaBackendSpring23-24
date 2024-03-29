@@ -8,21 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @RestControllerAdvice
 public class ExceptionsHandler {
-    @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(
-        HandlerMethodValidationException exception
-    ) {
-        HttpStatusCode statusCode = exception.getStatusCode();
-        String description = Arrays.toString(exception.getDetailMessageArguments());
-        ApiErrorResponse errorResponse =
-            buildDefaultErrorResponse(statusCode, description, exception);
-
-        return ResponseEntity.status(statusCode).body(errorResponse);
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {

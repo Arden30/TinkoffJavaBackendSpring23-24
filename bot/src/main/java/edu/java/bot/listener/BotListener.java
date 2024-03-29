@@ -4,16 +4,14 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.client.dto.request.AddLinkRequest;
-import edu.java.bot.client.dto.request.RemoveLinkRequest;
 import edu.java.bot.commands.Command;
-import edu.java.bot.links.LinkValidator;
 import edu.java.bot.model.State;
-import edu.java.bot.services.LinkService;
-import java.net.URI;
-import java.util.HashMap;
+import edu.java.bot.model.User;
+import edu.java.bot.services.MessageService;
+import edu.java.bot.services.UserService;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,21 +19,20 @@ import org.springframework.stereotype.Component;
 public class BotListener implements UpdatesListener, AutoCloseable {
     private final Map<String, Command> commands;
     private final TelegramBot telegramBot;
-    private final LinkService linkService;
-    private final Map<Long, State> states = new HashMap<>();
-    private final LinkValidator linkValidator;
+    private final UserService userService;
+    private final MessageService messageService;
 
     @Autowired
     public BotListener(
         Map<String, Command> commands,
         TelegramBot telegramBot,
-        LinkService linkService,
-        LinkValidator linkValidator
+        UserService userService,
+        MessageService messageService
     ) {
         this.commands = commands;
         this.telegramBot = telegramBot;
-        this.linkService = linkService;
-        this.linkValidator = linkValidator;
+        this.userService = userService;
+        this.messageService = messageService;
         telegramBot.setUpdatesListener(this);
     }
 
@@ -43,61 +40,31 @@ public class BotListener implements UpdatesListener, AutoCloseable {
     public int process(List<Update> list) {
         for (Update update : list) {
             Long id = update.message().chat().id();
-            String message = update.message().text();
+            Optional<User> userOptional = userService.findById(id);
 
-            State state = states.getOrDefault(id, State.DEFAULT);
+            if (userOptional.isPresent()) {
+                State state = userService.getUsers().get(id).getState();
 
-            if (!state.equals(State.DEFAULT)) {
-                if (!linkValidator.isValid(URI.create(message))) {
-                    telegramBot.execute(new SendMessage(
-                        id,
-                        "Link must be on GitHub repository or StackOverflow question!"
-                    ));
-                    states.put(id, State.DEFAULT);
-                    continue;
+                switch (state) {
+                    case ADD_LINK -> telegramBot.execute(messageService.addLink(id, update.message().text()));
+                    case DELETE_LINK -> telegramBot.execute(messageService.deleteLink(id, update.message().text()));
+                    default -> {
+                        if (commands.containsKey(update.message().text())) {
+                            telegramBot.execute(commands.get(update.message().text()).handle(update));
+                        } else {
+                            telegramBot.execute(new SendMessage(id, "No such command"));
+                        }
+                    }
                 }
 
-                telegramBot.execute(handle(update, state));
-                continue;
-            }
-
-            if (commands.containsKey(message)) {
-                State newState = commands.containsKey(message) ? commands.get(message).state() : State.DEFAULT;
-                states.put(id, newState);
-                telegramBot.execute(commands.get(message).handle(update));
             } else {
-                telegramBot.execute(new SendMessage(id, "No such command!"));
+                if (commands.containsKey(update.message().text())) {
+                    telegramBot.execute(commands.get(update.message().text()).handle(update));
+                }
             }
-
         }
 
         return com.pengrad.telegrambot.UpdatesListener.CONFIRMED_UPDATES_ALL;
-    }
-
-    private SendMessage handle(Update update, State state) {
-        String message;
-
-        switch (state) {
-            case ADD_LINK -> {
-                var response =
-                    linkService.addLink(update.message().chat().id(), new AddLinkRequest(update.message().text()));
-                message = response.isPresent() ? "This link " + update.message().text() + " is being tracked now!"
-                    : "Can't track this link (only github repositories and stackoverflow questions are available)";
-                states.put(update.message().chat().id(), State.DEFAULT);
-            }
-            case DELETE_LINK -> {
-                var response = linkService.deleteLink(
-                    update.message().chat().id(),
-                    new RemoveLinkRequest(update.message().text())
-                );
-                message = response.isPresent() ? "Link " + update.message().text() + " is being untracked now!"
-                    : "Can't untrack this link, because it's not being tracked";
-                states.put(update.message().chat().id(), State.DEFAULT);
-            }
-            default -> message = "Something went wrong";
-        }
-
-        return new SendMessage(update.message().chat().id(), message);
     }
 
     @Override

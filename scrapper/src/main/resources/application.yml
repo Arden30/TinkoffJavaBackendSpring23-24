@@ -1,7 +1,7 @@
 app:
   scheduler:
     enable: true
-    interval: 50000
+    interval: 10000
     force-check-delay: 10000
 
 github-client:
@@ -13,16 +13,9 @@ stackoverflow-client:
 spring:
   application:
     name: scrapper
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5555/scrapper
-    password: postgres
-    username: postgres
-  liquibase:
-    enabled: false
 
 bot-client:
-  base-url: http://localhost:8090/bot/api/v1/
+  base-url: https://localhost:8080
 
 server:
   port: 8080
