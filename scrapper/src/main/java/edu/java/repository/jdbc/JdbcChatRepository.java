@@ -21,6 +21,7 @@ public class JdbcChatRepository implements ChatRepository {
     private final static String ADD_CHAT = "INSERT INTO chat(id, created_at) VALUES (?, ?)";
     private final static String DELETE_CHAT = "DELETE FROM chat WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
+    
     private final JdbcMappersConfiguration jdbcMappersConfiguration;
     
     @Override
