@@ -1,6 +1,7 @@
 package edu.java.services.jdbc;
 
 import edu.java.api.exceptions.NoSuchLinkException;
+import edu.java.links.listener.LinkListener;
 import edu.java.model.Link;
 import edu.java.repository.jdbc.JdbcLinkRepository;
 import edu.java.services.LinkService;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class JdbcLinkService implements LinkService {
+    private final List<LinkListener> linkListeners;
     private final JdbcLinkRepository jdbcLinkRepository;
 
     @Override
@@ -26,6 +28,8 @@ public class JdbcLinkService implements LinkService {
         Link link = jdbcLinkRepository.findByUrl(url).orElseGet(() -> jdbcLinkRepository.addLink(newLink));
         jdbcLinkRepository.addLinkToChat(tgChatId, link.getId());
 
+        linkListeners.forEach(listener -> listener.onLinkAdd(link));
+
         return link;
     }
 
@@ -37,6 +41,7 @@ public class JdbcLinkService implements LinkService {
 
         if (!jdbcLinkRepository.findLinkInAllChats(link.getId())) {
             jdbcLinkRepository.removeLink(link.getId());
+            linkListeners.forEach(linkListener -> linkListener.onLinkRemove(link));
         }
 
         return link;

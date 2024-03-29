@@ -1,6 +1,7 @@
 package edu.java.services.jooq;
 
 import edu.java.api.exceptions.NoSuchLinkException;
+import edu.java.links.listener.LinkListener;
 import edu.java.model.Link;
 import edu.java.repository.jooq.JooqLinkRepository;
 import edu.java.services.LinkService;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class JooqLinkService implements LinkService {
+    private final List<LinkListener> linkListeners;
     private final JooqLinkRepository jooqLinkRepository;
 
     @Override
@@ -28,6 +30,8 @@ public class JooqLinkService implements LinkService {
         Link link = jooqLinkRepository.findByUrl(url).orElseGet(() -> jooqLinkRepository.addLink(newLink));
         jooqLinkRepository.addLinkToChat(tgChatId, link.getId());
 
+        linkListeners.forEach(listener -> listener.onLinkAdd(link));
+
         return link;
     }
 
@@ -39,6 +43,7 @@ public class JooqLinkService implements LinkService {
 
         if (!jooqLinkRepository.findLinkInAllChats(link.getId())) {
             jooqLinkRepository.removeLink(link.getId());
+            linkListeners.forEach(linkListener -> linkListener.onLinkRemove(link));
         }
 
         return link;

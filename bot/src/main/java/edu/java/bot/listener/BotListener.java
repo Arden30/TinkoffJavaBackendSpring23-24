@@ -50,7 +50,7 @@ public class BotListener implements UpdatesListener, AutoCloseable {
                 if (!linkValidator.isValid(message)) {
                     telegramBot.execute(new SendMessage(
                         id,
-                        "Link must be on GitHub repository or StackOverflow question!"
+                        "Invalid link!"
                     ));
                     states.put(id, State.DEFAULT);
                     continue;
