@@ -20,9 +20,9 @@ public class JdbcChatRepository implements ChatRepository {
     private final static String FIND_BY_ID = "SELECT * FROM chat WHERE id = ?";
     private final static String ADD_CHAT = "INSERT INTO chat(id, created_at) VALUES (?, ?)";
     private final static String DELETE_CHAT = "DELETE FROM chat WHERE id = ?";
-    private final JdbcMappersConfiguration jdbcMappersConfiguration;
     private final JdbcTemplate jdbcTemplate;
-    
+    private final JdbcMappersConfiguration jdbcMappersConfiguration;
+
     @Override
     public List<Chat> findAll() {
         return jdbcTemplate.query(FIND_ALL, new BeanPropertyRowMapper<>(Chat.class));
