@@ -26,6 +26,6 @@ public class TrackCommand implements Command {
     public SendMessage handle(Update update) {
         Long id = update.message().chat().id();
 
-        return new SendMessage(id, "Input your link to track (github/stackoverflow)");
+        return new SendMessage(id, "Input your link to track");
     }
 }

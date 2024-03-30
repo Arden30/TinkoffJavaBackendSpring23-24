@@ -4,10 +4,8 @@ import edu.java.api.dto.request.AddLinkRequest;
 import edu.java.api.dto.request.RemoveLinkRequest;
 import edu.java.api.dto.response.LinkResponse;
 import edu.java.api.dto.response.ListLinksResponse;
-import edu.java.model.Link;
 import edu.java.services.ChatService;
 import edu.java.services.LinkService;
-import edu.java.services.LinkTypeService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -30,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScrapperController {
     private final ChatService chatService;
     private final LinkService linkService;
-    private final LinkTypeService linkTypeService;
 
     @PostMapping("/tg-chat/{id}")
     public ResponseEntity<?> registerChat(@PathVariable("id") long id) {
@@ -60,8 +57,7 @@ public class ScrapperController {
         @RequestHeader("Tg-Chat-Id") long id,
         @RequestBody @Valid AddLinkRequest request
     ) {
-        Link link = linkService.add(id, request.link().toString());
-        linkTypeService.add(link);
+        linkService.add(id, request.link().toString());
 
         return ResponseEntity.ok(new LinkResponse(id, request.link()));
     }
@@ -71,8 +67,7 @@ public class ScrapperController {
         @RequestHeader("Tg-Chat-Id") long id,
         @RequestBody @Valid RemoveLinkRequest request
     ) {
-        Link link = linkService.remove(id, request.link().toString());
-        linkTypeService.remove(link);
+        linkService.remove(id, request.link().toString());
 
         return ResponseEntity.ok(new LinkResponse(id, request.link()));
     }

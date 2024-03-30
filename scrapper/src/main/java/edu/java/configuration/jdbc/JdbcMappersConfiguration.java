@@ -1,4 +1,4 @@
-package edu.java.configuration;
+package edu.java.configuration.jdbc;
 
 import edu.java.model.Chat;
 import edu.java.model.GitHubRepo;

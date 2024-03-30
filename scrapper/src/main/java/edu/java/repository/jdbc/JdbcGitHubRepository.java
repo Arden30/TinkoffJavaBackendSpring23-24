@@ -1,6 +1,6 @@
 package edu.java.repository.jdbc;
 
-import edu.java.configuration.JdbcMappersConfiguration;
+import edu.java.configuration.jdbc.JdbcMappersConfiguration;
 import edu.java.model.GitHubRepo;
 import edu.java.repository.GitHubRepository;
 import java.util.Optional;

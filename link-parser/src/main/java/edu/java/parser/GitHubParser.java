@@ -1,7 +1,7 @@
-package edu.java.links.parser;
+package edu.java.parser;
 
-import edu.java.links.response.GitHubParsingResponse;
-import edu.java.links.response.ParsingResponse;
+import edu.java.response.GitHubParsingResponse;
+import edu.java.response.ParsingResponse;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

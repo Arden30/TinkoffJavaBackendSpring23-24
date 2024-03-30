@@ -1,10 +1,12 @@
 package edu.java.schedulers.link_processors;
 
 import edu.java.clients.github.GitHubClient;
-import edu.java.links.response.GitHubParsingResponse;
-import edu.java.links.response.ParsingResponse;
 import edu.java.model.Link;
 import edu.java.repository.GitHubRepository;
+import edu.java.repository.LinkRepository;
+import edu.java.response.GitHubParsingResponse;
+import edu.java.response.ParsingResponse;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Objects;
@@ -18,6 +20,8 @@ public class GithubLinkUpdateProcessorService implements LinkUpdateProcessorServ
     private final GitHubClient gitHubClient;
     private final GitHubRepository gitHubRepository;
 
+    private final LinkRepository linkRepository;
+
     @Override
     public Optional<Map.Entry<Link, String>> process(Link link, ParsingResponse resp) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -27,6 +31,11 @@ public class GithubLinkUpdateProcessorService implements LinkUpdateProcessorServ
 
         var response = gitHubClient.fetchUser(res.name(), res.repo());
         if (response.isPresent()) {
+            if (link.getUpdatedAt().equals(OffsetDateTime.MIN)) {
+                link.setUpdatedAt(response.get().getUpdatedAt());
+                linkRepository.saveChanges(link);
+            }
+
             if (!link.getUpdatedAt().withOffsetSameInstant(ZoneOffset.UTC).equals(response.get().getUpdatedAt())) {
                 link.setUpdatedAt(response.get().getUpdatedAt());
                 stringBuilder.append(response.get().getName()).append(" was updated!").append("\n");

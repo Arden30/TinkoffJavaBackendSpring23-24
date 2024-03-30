@@ -2,12 +2,12 @@ package edu.java.schedulers.updater;
 
 import edu.java.clients.bot.BotWebClient;
 import edu.java.clients.bot.dto.request.LinkUpdateRequest;
-import edu.java.links.parser.LinkParser;
-import edu.java.links.response.ParsingResponse;
 import edu.java.model.Chat;
 import edu.java.model.Link;
+import edu.java.parser.LinkParser;
 import edu.java.repository.ChatRepository;
 import edu.java.repository.LinkRepository;
+import edu.java.response.ParsingResponse;
 import edu.java.schedulers.link_processors.LinkUpdateProcessorService;
 import java.net.URI;
 import java.time.Duration;

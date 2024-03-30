@@ -84,15 +84,14 @@ public class LinkRecord extends UpdatableRecordImpl<LinkRecord>
     /**
      * Setter for <code>LINK.UPDATED_AT</code>.
      */
-    public void setUpdatedAt(@NotNull OffsetDateTime value) {
+    public void setUpdatedAt(@Nullable OffsetDateTime value) {
         set(3, value);
     }
 
     /**
      * Getter for <code>LINK.UPDATED_AT</code>.
      */
-    @jakarta.validation.constraints.NotNull
-    @NotNull
+    @Nullable
     public OffsetDateTime getUpdatedAt() {
         return (OffsetDateTime) get(3);
     }
@@ -166,7 +165,7 @@ public class LinkRecord extends UpdatableRecordImpl<LinkRecord>
     }
 
     @Override
-    @NotNull
+    @Nullable
     public OffsetDateTime component4() {
         return getUpdatedAt();
     }
@@ -190,7 +189,7 @@ public class LinkRecord extends UpdatableRecordImpl<LinkRecord>
     }
 
     @Override
-    @NotNull
+    @Nullable
     public OffsetDateTime value4() {
         return getUpdatedAt();
     }
@@ -218,7 +217,7 @@ public class LinkRecord extends UpdatableRecordImpl<LinkRecord>
 
     @Override
     @NotNull
-    public LinkRecord value4(@NotNull OffsetDateTime value) {
+    public LinkRecord value4(@Nullable OffsetDateTime value) {
         setUpdatedAt(value);
         return this;
     }
@@ -229,7 +228,7 @@ public class LinkRecord extends UpdatableRecordImpl<LinkRecord>
         @Nullable Long value1,
         @NotNull String value2,
         @NotNull OffsetDateTime value3,
-        @NotNull OffsetDateTime value4
+        @Nullable OffsetDateTime value4
     ) {
         value1(value1);
         value2(value2);
@@ -257,7 +256,7 @@ public class LinkRecord extends UpdatableRecordImpl<LinkRecord>
         @Nullable Long id,
         @NotNull String url,
         @NotNull OffsetDateTime createdAt,
-        @NotNull OffsetDateTime updatedAt
+        @Nullable OffsetDateTime updatedAt
     ) {
         super(Link.LINK);
 

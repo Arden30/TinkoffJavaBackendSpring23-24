@@ -1,7 +1,7 @@
 package edu.java.schedulers.link_processors;
 
-import edu.java.links.response.ParsingResponse;
 import edu.java.model.Link;
+import edu.java.response.ParsingResponse;
 import java.util.Map;
 import java.util.Optional;
 

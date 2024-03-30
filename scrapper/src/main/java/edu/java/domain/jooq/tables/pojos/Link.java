@@ -47,7 +47,7 @@ public class Link implements Serializable {
         @Nullable Long id,
         @NotNull String url,
         @NotNull OffsetDateTime createdAt,
-        @NotNull OffsetDateTime updatedAt
+        @Nullable OffsetDateTime updatedAt
     ) {
         this.id = id;
         this.url = url;
@@ -106,8 +106,7 @@ public class Link implements Serializable {
     /**
      * Getter for <code>LINK.UPDATED_AT</code>.
      */
-    @jakarta.validation.constraints.NotNull
-    @NotNull
+    @Nullable
     public OffsetDateTime getUpdatedAt() {
         return this.updatedAt;
     }
@@ -115,7 +114,7 @@ public class Link implements Serializable {
     /**
      * Setter for <code>LINK.UPDATED_AT</code>.
      */
-    public void setUpdatedAt(@NotNull OffsetDateTime updatedAt) {
+    public void setUpdatedAt(@Nullable OffsetDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

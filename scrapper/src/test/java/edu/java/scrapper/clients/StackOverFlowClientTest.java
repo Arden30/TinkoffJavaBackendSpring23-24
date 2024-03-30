@@ -19,7 +19,7 @@ public class StackOverFlowClientTest {
     @Test
     @DisplayName("StackOverFlow client test")
     void test() {
-        stubFor(get("/questions/" + id + "/site=stackoverflow")
+        stubFor(get("/questions/" + id + "?site=stackoverflow")
             .willReturn(okJson(
                 getResponseBody(id, name)
             )));

@@ -1,4 +1,4 @@
-package edu.java.configuration;
+package edu.java.configuration.jdbc;
 
 import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.repository.jdbc.JdbcGitHubRepository;

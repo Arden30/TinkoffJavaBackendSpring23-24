@@ -34,7 +34,7 @@ public class StackOverFlowClientImpl implements StackOverFlowClient {
     @Override
     public Optional<StackOverFlowQuestion> fetchUser(long id) {
         return webClient.get()
-            .uri("/questions/{id}/site=stackoverflow", id)
+            .uri("/questions/{id}?site=stackoverflow", id)
             .retrieve()
             .bodyToMono(StackOverFlowResponse.class)
             .filter(questions -> !questions.getStackOverFlowQuestions().isEmpty())

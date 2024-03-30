@@ -7,9 +7,9 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.client.dto.request.AddLinkRequest;
 import edu.java.bot.client.dto.request.RemoveLinkRequest;
 import edu.java.bot.commands.Command;
-import edu.java.bot.links.LinkValidator;
 import edu.java.bot.model.State;
 import edu.java.bot.services.LinkService;
+import edu.java.parser.LinkParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,19 +22,19 @@ public class BotListener implements UpdatesListener, AutoCloseable {
     private final TelegramBot telegramBot;
     private final LinkService linkService;
     private final Map<Long, State> states = new HashMap<>();
-    private final LinkValidator linkValidator;
+    private final LinkParser linkParser;
 
     @Autowired
     public BotListener(
         Map<String, Command> commands,
         TelegramBot telegramBot,
         LinkService linkService,
-        LinkValidator linkValidator
+        LinkParser linkParser
     ) {
         this.commands = commands;
         this.telegramBot = telegramBot;
         this.linkService = linkService;
-        this.linkValidator = linkValidator;
+        this.linkParser = linkParser;
         telegramBot.setUpdatesListener(this);
     }
 
@@ -47,10 +47,10 @@ public class BotListener implements UpdatesListener, AutoCloseable {
             State state = states.getOrDefault(id, State.DEFAULT);
 
             if (!state.equals(State.DEFAULT)) {
-                if (!linkValidator.isValid(message)) {
+                if (linkParser.parse(message).isEmpty()) {
                     telegramBot.execute(new SendMessage(
                         id,
-                        "Link must be on GitHub repository or StackOverflow question!"
+                        "Invalid Link"
                     ));
                     states.put(id, State.DEFAULT);
                     continue;
@@ -81,7 +81,7 @@ public class BotListener implements UpdatesListener, AutoCloseable {
                 var response =
                     linkService.addLink(update.message().chat().id(), new AddLinkRequest(update.message().text()));
                 message = response.isPresent() ? "This link " + update.message().text() + " is being tracked now!"
-                    : "Can't track this link (only github repositories and stackoverflow questions are available)";
+                    : "Can't track this link";
                 states.put(update.message().chat().id(), State.DEFAULT);
             }
             case DELETE_LINK -> {

@@ -1,6 +1,6 @@
-package edu.java.links.parser;
+package edu.java.parser;
 
-import edu.java.links.response.ParsingResponse;
+import edu.java.response.ParsingResponse;
 import java.util.Optional;
 
 public abstract class LinkParser {

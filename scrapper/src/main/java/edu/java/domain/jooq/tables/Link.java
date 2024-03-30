@@ -83,7 +83,7 @@ public class Link extends TableImpl<LinkRecord> {
      * The column <code>LINK.UPDATED_AT</code>.
      */
     public final TableField<LinkRecord, OffsetDateTime> UPDATED_AT =
-        createField(DSL.name("UPDATED_AT"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false), this, "");
+        createField(DSL.name("UPDATED_AT"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "");
 
     private Link(Name alias, Table<LinkRecord> aliased) {
         this(alias, aliased, null);

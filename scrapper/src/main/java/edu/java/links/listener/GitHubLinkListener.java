@@ -1,24 +1,23 @@
-package edu.java.services.jdbc;
+package edu.java.links.listener;
 
 import edu.java.clients.github.GitHubClient;
-import edu.java.links.parser.LinkParser;
-import edu.java.links.response.GitHubParsingResponse;
 import edu.java.model.GitHubRepo;
 import edu.java.model.Link;
-import edu.java.repository.jdbc.JdbcGitHubRepository;
-import edu.java.services.LinkTypeService;
+import edu.java.parser.LinkParser;
+import edu.java.repository.GitHubRepository;
+import edu.java.response.GitHubParsingResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
-public class JdbcLinkTypeService implements LinkTypeService {
+public class GitHubLinkListener implements LinkListener {
     private final LinkParser linkParser;
+    private final GitHubRepository gitHubRepository;
     private final GitHubClient gitHubClient;
-    private final JdbcGitHubRepository jdbcGitHubRepository;
 
     @Override
-    @Transactional
-    public void add(Link link) {
+    public void onLinkAdd(Link link) {
         var parserResponse = linkParser.parse(link.getUrl());
 
         if (parserResponse.isPresent()) {
@@ -30,28 +29,27 @@ public class JdbcLinkTypeService implements LinkTypeService {
                     ((GitHubParsingResponse) parseResp).repo()
                 );
 
+                GitHubRepo gitHubRepo = new GitHubRepo();
                 if (gitHubResponse.isPresent()) {
-                    GitHubRepo gitHubRepo = new GitHubRepo();
                     gitHubRepo.setLinkId(link.getId());
                     gitHubRepo.setStars(gitHubResponse.get().getStars());
                     gitHubRepo.setIssues(gitHubResponse.get().getIssues());
-
-                    jdbcGitHubRepository.addRepo(gitHubRepo);
                 }
+
+                gitHubRepository.addRepo(gitHubRepo);
             }
         }
     }
 
     @Override
-    @Transactional
-    public void remove(Link link) {
+    public void onLinkRemove(Link link) {
         var parserResponse = linkParser.parse(link.getUrl());
 
         if (parserResponse.isPresent()) {
             var parseResp = parserResponse.get();
 
             if (parseResp instanceof GitHubParsingResponse) {
-                jdbcGitHubRepository.delete(link.getId());
+                gitHubRepository.delete(link.getId());
             }
         }
     }

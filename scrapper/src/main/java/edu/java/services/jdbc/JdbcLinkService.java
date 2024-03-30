@@ -2,6 +2,7 @@ package edu.java.services.jdbc;
 
 import edu.java.api.exceptions.DoubleLinkException;
 import edu.java.api.exceptions.NoSuchLinkException;
+import edu.java.links.listener.LinkListener;
 import edu.java.model.Link;
 import edu.java.repository.jdbc.JdbcLinkRepository;
 import edu.java.services.LinkService;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class JdbcLinkService implements LinkService {
+    private final List<LinkListener> linkListeners;
     private final JdbcLinkRepository jdbcLinkRepository;
 
     @Override
@@ -19,13 +21,16 @@ public class JdbcLinkService implements LinkService {
     public Link add(long tgChatId, String url) {
         Link newLink = new Link();
         newLink.setCreatedAt(OffsetDateTime.now());
-        newLink.setUpdatedAt(OffsetDateTime.now());
+        newLink.setUpdatedAt(OffsetDateTime.MIN);
         newLink.setUrl(url);
 
         Link link = jdbcLinkRepository.findByUrl(url).orElseGet(() -> jdbcLinkRepository.addLink(newLink));
+
         if (!jdbcLinkRepository.addLinkToChat(tgChatId, link.getId())) {
             throw new DoubleLinkException("Link is already being tracked");
         }
+
+        linkListeners.forEach(listener -> listener.onLinkAdd(link));
 
         return link;
     }
@@ -34,10 +39,14 @@ public class JdbcLinkService implements LinkService {
     @Transactional
     public Link remove(long tgChatId, String url) {
         Link link = jdbcLinkRepository.findByUrl(url).orElseThrow(() -> new NoSuchLinkException("Link was not found"));
-        jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId());
+
+        if (!jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId())) {
+            throw new NoSuchLinkException("No such link");
+        }
 
         if (!jdbcLinkRepository.findLinkInAllChats(link.getId())) {
             jdbcLinkRepository.removeLink(link.getId());
+            linkListeners.forEach(linkListener -> linkListener.onLinkRemove(link));
         }
 
         return link;
