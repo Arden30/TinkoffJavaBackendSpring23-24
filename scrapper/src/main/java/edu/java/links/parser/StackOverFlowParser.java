@@ -1,7 +1,7 @@
 package edu.java.links.parser;
 
 import edu.java.links.response.ParsingResponse;
-import edu.java.links.response.StackOverFlowResponse;
+import edu.java.links.response.StackOverFlowParsingResponse;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,10 +15,8 @@ public class StackOverFlowParser extends LinkParser {
         Matcher matcher = pattern.matcher(url.trim());
         if (matcher.find()) {
             String questionId = matcher.group(1);
-
-            return Optional.of(new StackOverFlowResponse(questionId));
+            return Optional.of(new StackOverFlowParsingResponse(questionId));
         }
-
         return parseNext(url);
     }
 }

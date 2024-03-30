@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -32,6 +34,11 @@ public class JdbcRepositoryTest extends IntegrationTest {
     private final String url = "https://github.com/Arden30/TinkoffJavaBackendSpring23-24";
     private final String url2 = "https://github.com/sanyarnd/java-course-2023-backend-template";
 
+    @DynamicPropertySource
+    public static void setJdbcAccessType(DynamicPropertyRegistry registry) {
+        registry.add("app.database-access-type", () -> "jdbc");
+    }
+  
     @BeforeEach
     void setUp() {
         link.setUrl(url);
@@ -61,7 +68,7 @@ public class JdbcRepositoryTest extends IntegrationTest {
         linkRepository.addLinkToChat(chat.getId(), link.getId());
 
         assertThat(linkRepository.findById(link.getId()).get().getUrl()).isEqualTo(url);
-        assertThat(linkRepository.findLinksByChatsId(chat.getId()).get(0).getUrl()).isEqualTo(url);
+        assertThat(linkRepository.findAllByChat(chat.getId()).get(0).getUrl()).isEqualTo(url);
     }
 
     @Test
@@ -99,7 +106,7 @@ public class JdbcRepositoryTest extends IntegrationTest {
         jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url2, link.getCreatedAt(), link.getUpdatedAt());
         jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 2L);
 
-        List<Link> links = linkRepository.findLinksByChatsId(chat.getId());
+        List<Link> links = linkRepository.findAllByChat(chat.getId());
         assertThat(links.get(0).getUrl()).isEqualTo(url);
         assertThat(links.get(1).getUrl()).isEqualTo(url2);
     }
@@ -116,7 +123,7 @@ public class JdbcRepositoryTest extends IntegrationTest {
 
         boolean res = linkRepository.removeLinkByChat(chat.getId(), 1L);
 
-        List<Link> links = linkRepository.findLinksByChatsId(chat.getId());
+        List<Link> links = linkRepository.findAllByChat(chat.getId());
 
         assertThat(res).isTrue();
         assertThat(links.size()).isEqualTo(1);

@@ -18,15 +18,20 @@ public abstract class LinkValidator {
 
     public abstract String getHostName();
 
-    public boolean isValid(URI uri) {
-        if (uri.getHost() != null && uri.getHost().equals(getHostName())) {
-            return true;
-        }
+    public boolean isValid(String link) {
+        try {
+            URI uri = URI.create(link);
+            if (uri.getHost() != null && uri.getHost().equals(getHostName())) {
+                return true;
+            }
 
-        if (next != null) {
-            return next.isValid(uri);
-        }
+            if (next != null) {
+                return next.isValid(link);
+            }
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

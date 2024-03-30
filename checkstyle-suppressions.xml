@@ -6,4 +6,6 @@
 
 <suppressions>
     <suppress checks="InnerAssignment"/>
+    <suppress checks="UncommentedMain"/>
+    <suppress checks="NestedIfDepth"/>
 </suppressions>

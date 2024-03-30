@@ -1,6 +1,6 @@
 package edu.java.repository.jdbc;
 
-import edu.java.configuration.JdbcMappersConfig;
+import edu.java.configuration.JdbcMappersConfiguration;
 import edu.java.model.Chat;
 import edu.java.repository.ChatRepository;
 import java.util.List;
@@ -8,12 +8,9 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @RequiredArgsConstructor
 public class JdbcChatRepository implements ChatRepository {
-    private final JdbcMappersConfig jdbcMappersConfig;
     private final static String FIND_ALL = "SELECT * FROM chat";
     private final static String FIND_ALL_BY_LINK = """
             SELECT chat.* FROM chat
@@ -24,6 +21,7 @@ public class JdbcChatRepository implements ChatRepository {
     private final static String ADD_CHAT = "INSERT INTO chat(id, created_at) VALUES (?, ?)";
     private final static String DELETE_CHAT = "DELETE FROM chat WHERE id = ?";
     private final JdbcTemplate jdbcTemplate;
+    private final JdbcMappersConfiguration jdbcMappersConfiguration;
 
     @Override
     public List<Chat> findAll() {
@@ -31,13 +29,13 @@ public class JdbcChatRepository implements ChatRepository {
     }
 
     @Override
-    public List<Chat> findChatsByLinksId(long linkId) {
-        return jdbcTemplate.query(FIND_ALL_BY_LINK, jdbcMappersConfig.chatMapper(), linkId);
+    public List<Chat> findAllByLink(long linkId) {
+        return jdbcTemplate.query(FIND_ALL_BY_LINK, jdbcMappersConfiguration.chatMapper(), linkId);
     }
 
     @Override
     public Optional<Chat> findById(long id) {
-        return jdbcTemplate.query(FIND_BY_ID, jdbcMappersConfig.chatMapper(), id).stream().findFirst();
+        return jdbcTemplate.query(FIND_BY_ID, jdbcMappersConfiguration.chatMapper(), id).stream().findFirst();
     }
 
     @Override

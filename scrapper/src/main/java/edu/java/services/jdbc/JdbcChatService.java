@@ -7,10 +7,8 @@ import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.services.ChatService;
 import java.time.OffsetDateTime;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
 public class JdbcChatService implements ChatService {
     private final JdbcChatRepository jdbcChatRepository;
