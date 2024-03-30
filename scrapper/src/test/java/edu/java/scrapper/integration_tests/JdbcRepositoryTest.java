@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -32,6 +34,11 @@ public class JdbcRepositoryTest extends IntegrationTest {
     private final String url = "https://github.com/Arden30/TinkoffJavaBackendSpring23-24";
     private final String url2 = "https://github.com/sanyarnd/java-course-2023-backend-template";
 
+    @DynamicPropertySource
+    public static void setJdbcAccessType(DynamicPropertyRegistry registry) {
+        registry.add("app.database-access-type", () -> "jdbc");
+    }
+  
     @BeforeEach
     void setUp() {
         link.setUrl(url);

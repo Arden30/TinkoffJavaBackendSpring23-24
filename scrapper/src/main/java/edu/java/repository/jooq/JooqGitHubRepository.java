@@ -1,26 +1,22 @@
 package edu.java.repository.jooq;
 
+import edu.java.domain.jooq.tables.records.GithubReposRecord;
 import edu.java.model.GitHubRepo;
 import edu.java.repository.GitHubRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Repository;
 import static edu.java.domain.jooq.tables.GithubRepos.GITHUB_REPOS;
 
-@Primary
-@Repository
 @RequiredArgsConstructor
 public class JooqGitHubRepository implements GitHubRepository {
     private final DSLContext dsl;
 
     @Override
     public Optional<GitHubRepo> findByLinkId(long linkId) {
-        return dsl.select(GITHUB_REPOS.fields())
-            .from(GITHUB_REPOS)
+        return dsl.selectFrom(GITHUB_REPOS)
             .where(GITHUB_REPOS.LINK_ID.eq(linkId))
-            .fetchOptionalInto(GitHubRepo.class);
+            .fetchOptional(this::mapToRepo);
     }
 
     @Override
@@ -45,5 +41,15 @@ public class JooqGitHubRepository implements GitHubRepository {
         return dsl.deleteFrom(GITHUB_REPOS)
             .where(GITHUB_REPOS.LINK_ID.eq(linkId))
             .execute() == 1;
+    }
+
+    public GitHubRepo mapToRepo(GithubReposRecord githubReposRecord) {
+        GitHubRepo gitHubRepo = new GitHubRepo();
+
+        gitHubRepo.setLinkId(githubReposRecord.getLinkId());
+        gitHubRepo.setStars(githubReposRecord.getStars());
+        gitHubRepo.setIssues(githubReposRecord.getIssues());
+
+        return gitHubRepo;
     }
 }

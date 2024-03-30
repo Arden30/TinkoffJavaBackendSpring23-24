@@ -18,7 +18,6 @@ public class StackOverFlowParser extends LinkParser {
 
             return Optional.of(new StackOverFlowParsingResponse(questionId));
         }
-
         return parseNext(url);
     }
 }

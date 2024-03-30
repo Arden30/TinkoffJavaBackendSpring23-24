@@ -9,10 +9,8 @@ import edu.java.services.LinkService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
 public class JdbcLinkService implements LinkService {
     private final List<LinkListener> linkListeners;
@@ -40,9 +38,7 @@ public class JdbcLinkService implements LinkService {
     @Transactional
     public Link remove(long tgChatId, String url) {
         Link link = jdbcLinkRepository.findByUrl(url).orElseThrow(() -> new NoSuchLinkException("Link was not found"));
-        if (!jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId())) {
-            throw new NoSuchLinkException("No such link");
-        }
+        jdbcLinkRepository.removeLinkByChat(tgChatId, link.getId());
 
         if (!jdbcLinkRepository.findLinkInAllChats(link.getId())) {
             jdbcLinkRepository.removeLink(link.getId());

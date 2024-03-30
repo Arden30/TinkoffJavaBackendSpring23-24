@@ -1,5 +1,6 @@
 package edu.java.repository.jooq;
 
+import edu.java.domain.jooq.tables.records.LinkRecord;
 import edu.java.model.Link;
 import edu.java.repository.LinkRepository;
 import java.time.OffsetDateTime;
@@ -7,14 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Repository;
 import static edu.java.domain.jooq.tables.Chat.CHAT;
 import static edu.java.domain.jooq.tables.Link.LINK;
 import static edu.java.domain.jooq.tables.LinkToChat.LINK_TO_CHAT;
 
-@Primary
-@Repository
 @RequiredArgsConstructor
 public class JooqLinkRepository implements LinkRepository {
     private final DSLContext dsl;
@@ -26,23 +23,22 @@ public class JooqLinkRepository implements LinkRepository {
             .join(LINK_TO_CHAT)
             .on(LINK.ID.eq(LINK_TO_CHAT.LINK_ID))
             .where(LINK_TO_CHAT.CHAT_ID.eq(chatId))
-            .fetchInto(Link.class);
+            .fetchGroups(LINK)
+            .keySet().stream().map(this::mapToLink).toList();
     }
 
     @Override
     public Optional<Link> findById(long linkId) {
-        return dsl.select(LINK)
-            .from(LINK)
+        return dsl.selectFrom(LINK)
             .where(LINK.ID.eq(linkId))
-            .fetchOptionalInto(Link.class);
+            .fetchOptional(this::mapToLink);
     }
 
     @Override
     public Optional<Link> findByUrl(String url) {
-        return dsl.select(LINK)
-            .from(LINK)
+        return dsl.selectFrom(LINK)
             .where(LINK.URL.eq(url))
-            .fetchOptionalInto(Link.class);
+            .fetchOptional(this::mapToLink);
     }
 
     @Override
@@ -108,6 +104,15 @@ public class JooqLinkRepository implements LinkRepository {
     public List<Link> recentlyUpdated(OffsetDateTime oldThan) {
         return dsl.selectFrom(LINK)
             .where(LINK.UPDATED_AT.lessThan(oldThan))
-            .fetchInto(Link.class);
+            .fetch(this::mapToLink);
+    }
+
+    public Link mapToLink(LinkRecord link) {
+        Link lk = new Link();
+        lk.setId(link.getId());
+        lk.setUrl(link.getUrl());
+        lk.setUpdatedAt(link.getUpdatedAt());
+
+        return lk;
     }
 }

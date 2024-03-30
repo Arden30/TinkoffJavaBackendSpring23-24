@@ -4,6 +4,9 @@ import edu.java.model.Chat;
 import edu.java.model.Link;
 import edu.java.repository.jooq.JooqChatRepository;
 import edu.java.repository.jooq.JooqLinkRepository;
+import java.time.OffsetDateTime;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
@@ -31,6 +37,11 @@ public class JooqRepositoryTest extends IntegrationTest {
     private final String url = "https://github.com/Arden30/TinkoffJavaBackendSpring23-24";
     private final String url2 = "https://github.com/sanyarnd/java-course-2023-backend-template";
 
+    @DynamicPropertySource
+    public static void setJooqAccessType(DynamicPropertyRegistry registry) {
+        registry.add("app.database-access-type", () -> "jooq");
+    }
+
     @BeforeEach
     void setUp() {
         link.setUrl(url);
@@ -46,6 +57,7 @@ public class JooqRepositoryTest extends IntegrationTest {
     }
 
     @BeforeEach
+    @AfterEach
     public void restartIdentity() {
         jdbcTemplate.update("TRUNCATE link_to_chat RESTART IDENTITY");
         jdbcTemplate.update("TRUNCATE chat RESTART IDENTITY CASCADE");
@@ -64,7 +76,12 @@ public class JooqRepositoryTest extends IntegrationTest {
 
     @Test
     void removeAndFindLinkTest() {
-        jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", link.getUrl(), link.getCreatedAt(), link.getUpdatedAt());
+        jdbcTemplate.update(
+            "INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)",
+            link.getUrl(),
+            link.getCreatedAt(),
+            link.getUpdatedAt()
+        );
         boolean res = linkRepository.removeLink(1L);
 
         assertThat(res).isTrue();
@@ -90,11 +107,20 @@ public class JooqRepositoryTest extends IntegrationTest {
     @Test
     void findAllByChatTest() {
         jdbcTemplate.update("INSERT INTO chat(id, created_at) VALUES (?, ?)", chat.getId(), chat.getCreatedAt());
-
-        jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url, link.getCreatedAt(), link.getUpdatedAt());
+        jdbcTemplate.update(
+            "INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)",
+            url,
+            link.getCreatedAt(),
+            link.getUpdatedAt()
+        );
         jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 1L);
 
-        jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url2, link.getCreatedAt(), link.getUpdatedAt());
+        jdbcTemplate.update(
+            "INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)",
+            url2,
+            link.getCreatedAt(),
+            link.getUpdatedAt()
+        );
         jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 2L);
 
         List<Link> links = linkRepository.findAllByChat(chat.getId());
@@ -106,10 +132,20 @@ public class JooqRepositoryTest extends IntegrationTest {
     void removeLinkByChatTest() {
         jdbcTemplate.update("INSERT INTO chat(id, created_at) VALUES (?, ?)", chat.getId(), chat.getCreatedAt());
 
-        jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url, link.getCreatedAt(), link.getUpdatedAt());
+        jdbcTemplate.update(
+            "INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)",
+            url,
+            link.getCreatedAt(),
+            link.getUpdatedAt()
+        );
         jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 1L);
 
-        jdbcTemplate.update("INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)", url2, link.getCreatedAt(), link.getUpdatedAt());
+        jdbcTemplate.update(
+            "INSERT INTO link(url, created_at, updated_at) VALUES (?, ?, ?)",
+            url2,
+            link.getCreatedAt(),
+            link.getUpdatedAt()
+        );
         jdbcTemplate.update("INSERT INTO link_to_chat VALUES (?, ?)", chat.getId(), 2L);
 
         boolean res = linkRepository.removeLinkByChat(chat.getId(), 1L);
