@@ -2,9 +2,7 @@ package edu.java.schedulers.updater;
 
 import edu.java.clients.bot.BotWebClient;
 import edu.java.clients.bot.dto.request.LinkUpdateRequest;
-import edu.java.links.parser.GitHubParser;
 import edu.java.links.parser.LinkParser;
-import edu.java.links.parser.StackOverFlowParser;
 import edu.java.links.response.ParsingResponse;
 import edu.java.model.Chat;
 import edu.java.model.Link;
@@ -16,9 +14,9 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,28 +26,29 @@ public class LinkUpdaterImpl implements LinkUpdater {
     private final LinkRepository linkRepository;
     private final ChatRepository chatRepository;
     private final BotWebClient botWebClient;
-    @Value("${app.scheduler.force-check-delay}")
-    private final Duration update;
-    private final LinkParser parser = LinkParser.createChain(new GitHubParser(), new StackOverFlowParser());
+    private final Duration forceCheckDelay;
+    private final LinkParser parser;
     private final List<LinkUpdateProcessorService> linkUpdateProcessorService;
 
     @Override
     @Transactional
     public void update() {
-        List<Link> updatedLinks = linkRepository.recentlyUpdated(OffsetDateTime.now().minus(update));
-        List<Link> linksForNotify = new ArrayList<>();
+        List<Link> updatedLinks = linkRepository.recentlyUpdated(OffsetDateTime.now().minus(forceCheckDelay));
+
+        List<Map.Entry<Link, String>> linksForNotify = new ArrayList<>();
         for (Link link : updatedLinks) {
             var parserResponse = parseUrl(link.getUrl());
 
             if (parserResponse.isPresent()) {
                 for (LinkUpdateProcessorService service : linkUpdateProcessorService) {
-                    Optional<Link> upd = service.process(link, parserResponse.get());
+                    Optional<Map.Entry<Link, String>> upd = service.process(link, parserResponse.get());
                     upd.ifPresent(linksForNotify::add);
                 }
             }
         }
 
-        linksForNotify.forEach(linkRepository::save);
+        linksForNotify.stream().toList()
+            .forEach(linkStringEntry -> linkRepository.saveChanges(linkStringEntry.getKey()));
         notifyBot(linksForNotify);
     }
 
@@ -57,15 +56,15 @@ public class LinkUpdaterImpl implements LinkUpdater {
         return parser.parse(url);
     }
 
-    public void notifyBot(List<Link> links) {
-        for (Link link : links) {
-            List<Chat> chats = chatRepository.findChatsByLinksId(link.getId());
+    public void notifyBot(List<Map.Entry<Link, String>> linksWithChanges) {
+        for (var link : linksWithChanges) {
+            List<Chat> chats = chatRepository.findAllByLink(link.getKey().getId());
             LinkUpdateRequest request = LinkUpdateRequest
                 .builder()
-                .id(link.getId())
-                .description("Link was updated!")
+                .id(link.getKey().getId())
+                .description(link.getValue())
                 .tgChatIds(chats.stream().map(Chat::getId).toList())
-                .url(URI.create(link.getUrl()))
+                .url(URI.create(link.getKey().getUrl()))
                 .build();
 
             botWebClient.sendUpdate(request);

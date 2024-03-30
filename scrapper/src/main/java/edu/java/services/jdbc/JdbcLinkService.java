@@ -2,6 +2,7 @@ package edu.java.services.jdbc;
 
 import edu.java.api.exceptions.DoubleLinkException;
 import edu.java.api.exceptions.NoSuchLinkException;
+import edu.java.links.listener.LinkListener;
 import edu.java.model.Link;
 import edu.java.repository.jdbc.JdbcLinkRepository;
 import edu.java.services.LinkService;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class JdbcLinkService implements LinkService {
+    private final List<LinkListener> linkListeners;
     private final JdbcLinkRepository jdbcLinkRepository;
 
     @Override
@@ -29,6 +31,8 @@ public class JdbcLinkService implements LinkService {
             throw new DoubleLinkException("Link is already being tracked");
         }
 
+        linkListeners.forEach(listener -> listener.onLinkAdd(link));
+
         return link;
     }
 
@@ -42,6 +46,7 @@ public class JdbcLinkService implements LinkService {
 
         if (!jdbcLinkRepository.findLinkInAllChats(link.getId())) {
             jdbcLinkRepository.removeLink(link.getId());
+            linkListeners.forEach(linkListener -> linkListener.onLinkRemove(link));
         }
 
         return link;
@@ -49,6 +54,6 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public List<Link> listAll(long tgChatId) {
-        return jdbcLinkRepository.findLinksByChatsId(tgChatId);
+        return jdbcLinkRepository.findAllByChat(tgChatId);
     }
 }

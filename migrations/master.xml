@@ -10,4 +10,7 @@
     <changeSet id="1-schema.sql" author="Denis Arsenev">
         <sqlFile path="schema.sql"/>
     </changeSet>
+    <changeSet id="2-link_types.sql" author="Denis Arsenev">
+        <sqlFile path="link_types.sql"/>
+    </changeSet>
 </databaseChangeLog>

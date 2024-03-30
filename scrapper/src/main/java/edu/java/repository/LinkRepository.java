@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LinkRepository {
-     List<Link> findLinksByChatsId(long chatId);
+    List<Link> findAllByChat(long chatId);
 
     Optional<Link> findById(long linkId);
 
@@ -14,7 +14,7 @@ public interface LinkRepository {
 
     Link addLink(Link link);
 
-    void save(Link link);
+    void saveChanges(Link link);
 
     boolean addLinkToChat(long chatId, long linkId);
 
