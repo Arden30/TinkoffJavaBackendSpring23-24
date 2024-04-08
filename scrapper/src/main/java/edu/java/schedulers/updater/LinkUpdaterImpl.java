@@ -1,6 +1,5 @@
 package edu.java.schedulers.updater;
 
-import edu.java.clients.bot.BotWebClient;
 import edu.java.clients.bot.dto.request.LinkUpdateRequest;
 import edu.java.model.Chat;
 import edu.java.model.Link;
@@ -9,6 +8,7 @@ import edu.java.repository.ChatRepository;
 import edu.java.repository.LinkRepository;
 import edu.java.response.ParsingResponse;
 import edu.java.schedulers.link_processors.LinkUpdateProcessorService;
+import edu.java.schedulers.notifiers.Notifier;
 import java.net.URI;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class LinkUpdaterImpl implements LinkUpdater {
     private final LinkRepository linkRepository;
     private final ChatRepository chatRepository;
-    private final BotWebClient botWebClient;
     private final Duration forceCheckDelay;
     private final LinkParser parser;
     private final List<LinkUpdateProcessorService> linkUpdateProcessorService;
+    private final Notifier notifier;
 
     @Override
     @Transactional
@@ -67,7 +67,7 @@ public class LinkUpdaterImpl implements LinkUpdater {
                 .url(URI.create(link.getKey().getUrl()))
                 .build();
 
-            botWebClient.sendUpdate(request);
+            notifier.notify(request);
         }
     }
 }

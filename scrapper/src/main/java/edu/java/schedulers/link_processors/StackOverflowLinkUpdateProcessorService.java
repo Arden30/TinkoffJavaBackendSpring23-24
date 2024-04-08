@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class StackOverflowLinkUpdateProcessorService implements LinkUpdateProcessorService {
     private final StackOverFlowClient stackOverFlowClient;
     private final LinkRepository linkRepository;
+
     @Override
     public Optional<Map.Entry<Link, String>> process(Link link, ParsingResponse resp) {
         if (!(resp instanceof StackOverFlowParsingResponse response)) {
