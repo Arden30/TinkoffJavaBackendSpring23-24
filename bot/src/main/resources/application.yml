@@ -1,5 +1,22 @@
 app:
   telegram-token: ${TELEGRAM_API_KEY}
+  kafka-producer-settings:
+    bootstrap-servers: localhost:9092
+    client-id: dlqGroup
+    delivery-timeout: 100000
+    linger-ms: 2000
+    batch-size: 200000
+    enable-idempotence: true
+  kafka-consumer-settings:
+    bootstrap-servers: localhost:9092
+    group-id: consumerGroup
+    auto-offset-reset: latest
+    enable-auto-commit: true
+    concurrency: 3
+  kafka-update-topic:
+    name: linkUpdate
+    partitions: 1
+    replicas: 1
 
 spring:
   application:

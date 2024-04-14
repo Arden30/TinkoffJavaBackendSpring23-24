@@ -18,7 +18,15 @@ public record ApplicationConfig(
     Scheduler scheduler,
 
     @NotNull
-    AccessType databaseAccessType
+    AccessType databaseAccessType,
+
+    @NotNull
+    KafkaProducerSettings kafkaProducerSettings,
+
+    @NotNull
+    KafkaUpdateTopic kafkaUpdateTopic,
+
+    Boolean useQueue
 ) {
     @Bean
     public Duration forceCheckDelay() {
@@ -42,4 +50,16 @@ public record ApplicationConfig(
                             @NotNull Duration forceCheckDelay) {
     }
 
+    public record KafkaProducerSettings(@NotNull String bootstrapServers,
+                                        String clientId,
+                                        Duration deliveryTimeout,
+                                        Integer lingerMs,
+                                        Integer batchSize,
+                                        Boolean enableIdempotence) {
+    }
+
+    public record KafkaUpdateTopic(String name,
+                                  Integer partitions,
+                                  Integer replicas) {
+    }
 }

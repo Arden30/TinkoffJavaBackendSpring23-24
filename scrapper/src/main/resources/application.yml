@@ -1,9 +1,21 @@
 app:
   scheduler:
     enable: true
-    interval: 50000
+    interval: 60000
     force-check-delay: 10000
   database-access-type: jdbc
+  kafka-producer-settings:
+    bootstrap-servers: localhost:9092
+    client-id: producerUpdateGroup
+    delivery-timeout: 100000
+    linger-ms: 2000
+    batch-size: 200000
+    enable-idempotence: true
+  kafka-update-topic:
+    name: linkUpdate
+    partitions: 1
+    replicas: 1
+  useQueue: true
 
 github-client:
   base-url: https://api.github.com/
