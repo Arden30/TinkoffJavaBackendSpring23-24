@@ -16,7 +16,9 @@ public record ApplicationConfig(
     @NotNull
     KafkaConsumerSettings kafkaConsumerSettings,
     @NotNull
-    KafkaUpdateTopic kafkaUpdateTopic
+    KafkaUpdateTopic kafkaUpdateTopic,
+    @NotNull
+    String micrometer
 ) {
     public record KafkaProducerSettings(@NotNull String bootstrapServers,
                                         String clientId,
