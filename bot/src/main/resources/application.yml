@@ -17,6 +17,28 @@ app:
     name: linkUpdate
     partitions: 1
     replicas: 1
+  micrometer: messages-counter
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      enabled: true
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      base-path: /
+      path-mapping:
+        prometheus: "metrics"
+      exposure:
+        include: info, health, prometheus
+  server:
+    port: 8091
 
 spring:
   application:

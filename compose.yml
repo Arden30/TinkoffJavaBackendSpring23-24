@@ -64,10 +64,31 @@ services:
     depends_on:
       - zoo1
 
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
 volumes:
   postgresql: { }
   zookeeper: { }
   kafka: { }
+  prometheus_data: { }
+  grafana_data: { }
 
 networks:
   backend: { }
